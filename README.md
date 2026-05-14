@@ -49,7 +49,11 @@ This mechanic connects to our vision of turning a static pixel-sorted image into
 
 ### 🎵 Audio Mechanic (Karina)
 
-> [Karina to fill in their own description. Aim for 100+ words covering: what this mechanic does, how audio frequency data drives the visuals, and how it connects to the vision of a responsive, sound-reactive pixel-sorted texture.]
+The system analyses the incoming audio and measures its amplitude (overall loudness) and frequency content. These values are combined with the user’s mouse movement to control the pixel-sorting effect. When the user drags the mouse across the screen, the selected area becomes active and begins to respond to the surrounding sound rather than reacting automatically from the start.
+
+When the audio is quiet, the pixels shift gently and remain mostly stable. As the sound becomes louder, the dragged area stretches and displaces horizontally, creating a stronger glitch-like distortion. Low frequencies (bass) move larger groups of pixels, while high frequencies generate finer and more detailed textures. This makes the image pulse and shimmer in sync with both the user’s gestures and the live audio input.
+
+The mechanic connects directly to the project vision by combining human interaction with sound-responsive visuals. The artwork only comes alive after the user touches and drags across the image, turning the static pixel-sorted composition into a dynamic texture shaped collaboratively by movement and audio.
 
 <!-- Karina: add a sketch or diagram image here using the format below -->
 <!-- ![Karina's mechanic sketch](images/karina-sketch.jpg) -->
