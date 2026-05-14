@@ -31,9 +31,6 @@ The User Input mechanic serves as the primary controller for the real-time pixel
 
 Beyond horizontal movement, the vertical y-axis of the mouse controls the length and intensity of these streaks, letting the user stretch the textures into deep, volcanic-like patterns. For further customization, pressing the C key on the keyboard cycles through different color gradients, shifting the visual mood from warm oranges to cool blues. This interactivity directly fulfills our project vision of creating a living artwork. Instead of watching a pre-recorded animation, the viewer actively shapes the geological flow, ensuring that the landscape is constantly shifting and never repeats itself.
 
-<!-- Joy: add a sketch or diagram image here using the format below -->
-<!-- ![Joy's mechanic sketch](images/joy-sketch.jpg) -->
-
 ---
 
 ### ⏱️ Time-Based Mechanic (Lihang)
@@ -41,9 +38,6 @@ Beyond horizontal movement, the vertical y-axis of the mouse controls the length
 For the time-based mechanic, I plan to use timers and gradual events to make the artwork feel like it is constantly breathing and transforming, even when the user is not directly interacting with it. The piece will move through slow visual cycles, where the pixel-sorted texture shifts between calm, unstable, and intense states. For example, every few seconds the sorting strength can increase, causing the vertical colour streaks to stretch downward like melting lava or digital rain. After reaching a peak, the distortion will slowly fade back into a quieter state before the next cycle begins.
 
 This mechanic connects to our vision of turning a static pixel-sorted image into a living digital landscape. Time becomes the force that keeps the artwork alive. Instead of the image staying frozen, it gradually changes like geological movement, volcanic heat, or flowing magma. The user does not need to click or drag to experience this mechanic; they can simply watch the artwork evolve over time. This creates a sense of rhythm and anticipation, making the piece feel unstable, organic, and continuously in motion.
-
-<!-- Lihang: add a sketch or diagram image here using the format below -->
-<!-- ![Lihang's mechanic sketch](images/lihang-sketch.jpg) -->
 
 ---
 
@@ -55,9 +49,6 @@ When the audio is quiet, the pixels shift gently and remain mostly stable. As th
 
 The mechanic connects directly to the project vision by combining human interaction with sound-responsive visuals. The artwork only comes alive after the user touches and drags across the image, turning the static pixel-sorted composition into a dynamic texture shaped collaboratively by movement and audio.
 
-<!-- Karina: add a sketch or diagram image here using the format below -->
-<!-- ![Karina's mechanic sketch](images/karina-sketch.jpg) -->
-
 ---
 
 ### 🌊 Perlin Noise & Randomness (Adinata)
@@ -67,9 +58,6 @@ For my mechanic, I plan to use Perlin noise to create a sense of depth and organ
 My idea is to use Perlin noise to control how the colours shift across the canvas and how deep the pixel sorting effect goes in different regions, creating an illusion of layers where some areas feel close and glowing, and others feel dark and deep. Over time, these regions will slowly drift and evolve, making the piece feel like a living, biological liquid rather than a static image.
 
 I will also incorporate a random seed so that the piece can reproduce the same starting state, while still feeling unpredictable as it flows. The user experiences this mechanic by simply watching. The artwork rewards patience, as it never quite repeats itself.
-
-<!-- Adinata: add a sketch or diagram image here using the format below -->
-<!-- ![Adinata's mechanic sketch](images/adinata-sketch.jpg) -->
 
 ---
 
