@@ -27,7 +27,9 @@ We reinterpret *Sorted* by transforming its static frozen texture into a living,
 
 ### 🖱️ User Input (Joy)
 
-> [Joy to fill in their own description. Aim for 100+ words covering: what this mechanic does, how the user interacts with it (mouse, keyboard, or other input), and how it connects to the vision of a living, reactive pixel-sorted artwork.]
+The User Input mechanic serves as the primary controller for the real-time pixel sorting process, turning a static image into a responsive digital environment. The core interaction is mapped to the horizontal movement of the mouse. By moving the mouse along the x-axis, the user adjusts the brightness threshold of the sorting algorithm. Moving the mouse to the left lowers this threshold, allowing more pixels to break free and flow downward in long streaks. Moving it to the right increases the threshold, which stops the movement and stabilizes the image.
+
+Beyond horizontal movement, the vertical y-axis of the mouse controls the length and intensity of these streaks, letting the user stretch the textures into deep, volcanic-like patterns. For further customization, pressing the C key on the keyboard cycles through different color gradients, shifting the visual mood from warm oranges to cool blues. This interactivity directly fulfills our project vision of creating a living artwork. Instead of watching a pre-recorded animation, the viewer actively shapes the geological flow, ensuring that the landscape is constantly shifting and never repeats itself.
 
 <!-- Joy: add a sketch or diagram image here using the format below -->
 <!-- ![Joy's mechanic sketch](images/joy-sketch.jpg) -->
