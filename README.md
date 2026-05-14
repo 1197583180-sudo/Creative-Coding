@@ -36,7 +36,9 @@ We reinterpret *Sorted* by transforming its static frozen texture into a living,
 
 ### ⏱️ Time-Based Mechanic (Lihang)
 
-> [Lihang to fill in their own description. Aim for 100+ words covering: what this mechanic does, how timers and scheduled events are used, and how it connects to the vision of rhythmic, cyclical change in the artwork.]
+For the time-based mechanic, I plan to use timers and gradual events to make the artwork feel like it is constantly breathing and transforming, even when the user is not directly interacting with it. The piece will move through slow visual cycles, where the pixel-sorted texture shifts between calm, unstable, and intense states. For example, every few seconds the sorting strength can increase, causing the vertical colour streaks to stretch downward like melting lava or digital rain. After reaching a peak, the distortion will slowly fade back into a quieter state before the next cycle begins.
+
+This mechanic connects to our vision of turning a static pixel-sorted image into a living digital landscape. Time becomes the force that keeps the artwork alive. Instead of the image staying frozen, it gradually changes like geological movement, volcanic heat, or flowing magma. The user does not need to click or drag to experience this mechanic; they can simply watch the artwork evolve over time. This creates a sense of rhythm and anticipation, making the piece feel unstable, organic, and continuously in motion.
 
 <!-- Lihang: add a sketch or diagram image here using the format below -->
 <!-- ![Lihang's mechanic sketch](images/lihang-sketch.jpg) -->
