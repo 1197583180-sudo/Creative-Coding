@@ -1,21 +1,50 @@
 <!DOCTYPE html>
+<!--
+  页面入口文件：负责加载样式、p5 库和我们自己的 JavaScript 文件。
+  Entry file: loads styles, the p5 libraries, and our own JavaScript files.
+-->
 <html lang="en">
   <head>
+    <!-- 使用 UTF-8 编码，保证英文、中文和特殊符号都能正常显示。 -->
+    <!-- Use UTF-8 encoding so English, Chinese, and special characters display correctly. -->
     <meta charset="utf-8" />
+
+    <!-- 让页面在手机、平板和桌面窗口中按真实屏幕宽度适配。 -->
+    <!-- Make the page adapt to the real screen width on phones, tablets, and desktop windows. -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!-- 浏览器标签页标题。 -->
+    <!-- Browser tab title. -->
     <title>The Great Wave — IDEA9103</title>
 
+    <!-- 加载页面样式，主要用于去掉边距并让 canvas 全屏显示。 -->
+    <!-- Load page styles, mainly to remove margins and make the canvas fill the screen. -->
     <link rel="stylesheet" type="text/css" href="style.css">
 
+    <!-- 加载 p5.js 主库，提供 createCanvas、draw、noise、shape 等绘图功能。 -->
+    <!-- Load the main p5.js library, which provides createCanvas, draw, noise, shape drawing, and more. -->
     <script src="libraries/p5.min.js"></script>
+
+    <!-- 加载 p5.sound。当前还没有使用，但后续 audio mechanic 会需要它。 -->
+    <!-- Load p5.sound. It is not used yet, but the future audio mechanic will need it. -->
     <script src="libraries/p5.sound.min.js"></script>
+
+    <!-- Time-based mechanic：时间推进、船的漂浮、背景浪运动、太阳脉冲。 -->
+    <!-- Time-based mechanic: time progression, boat floating, background-wave motion, and sun pulse. -->
     <script src="time-mechanic.js"></script>
+
+    <!-- Perlin noise mechanic：海浪形状、海浪偏移、太阳光芒闪烁。 -->
+    <!-- Perlin noise mechanic: wave shapes, wave offsets, and sun-ray flicker. -->
     <script src="perlin-mechanic.js"></script>
+
+    <!-- 基础绘制：画布初始化、颜色、背景、船、山和太阳组合。 -->
+    <!-- Base artwork drawing: canvas setup, colors, background, boats, mountain, and sun composition. -->
     <script src="artwork-base.js"></script>
   </head>
 
   <body>
+    <!-- 主流程文件最后加载，因为它会调用上面几个文件中定义的函数。 -->
+    <!-- Main orchestration file loads last because it calls functions defined in the files above. -->
     <script src="sketch.js"></script>
   </body>
 </html>
