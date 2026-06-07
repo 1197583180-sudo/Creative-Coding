@@ -59,4 +59,6 @@ I will also incorporate a random seed so that the piece can reproduce the same s
 
 ## Part 3: How the Mechanics Come Together
 
+![Live preview of the generative artwork](images/sketch-preview.png)
+
 Each mechanic operates on a different axis of the artwork. Perlin noise defines the spatial seascape — sculpting which regions surge with turbulence and which hold in deep calm. Audio reshapes that seascape in real time, amplifying the wave wherever sound crests. Time drives the slow tidal cycle, building the wave from stillness to its peak and letting it recede, ensuring the piece never fully settles even in silence. User input layers personal agency on top, letting the viewer direct the current and steer the distortion like wind across the surface. Together they create a single coherent experience: Hokusai's frozen wave, now fluid, musical, cyclical, and responsive — a sea that never breaks the same way twice.
