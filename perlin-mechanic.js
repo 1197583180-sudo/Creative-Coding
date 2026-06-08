@@ -15,14 +15,14 @@ function setupWaveColors() {
 // 前景海浪的数据。每个对象代表一条独立的波浪线。
 // Foreground wave data. Each object represents one independent wave line.
 const waveLines = [
-  { speed: 80, baseY: 218, timeOffset: 3.2, rangeMin: 300, rangeMax: 400, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
-  { speed: 70, baseY: 255, timeOffset: 0.0, rangeMin: 310, rangeMax: 400, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
-  { speed: 50, baseY: 288, timeOffset: 4.7, rangeMin: 310, rangeMax: 450, colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
-  { speed: 60, baseY: 322, timeOffset: 1.8, rangeMin: 320, rangeMax: 480, colorKeys: ['prussian', 'cobalt', 'blue'],     filled: true, history: [] },
-  { speed: 50, baseY: 360, timeOffset: 2.5, rangeMin: 330, rangeMax: 470, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
-  { speed: 40, baseY: 370, timeOffset: 5.8, rangeMin: 340, rangeMax: 520, colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
-  { speed: 45, baseY: 405, timeOffset: 1.1, rangeMin: 340, rangeMax: 520, colorKeys: ['darkNavy', 'prussian', 'cobalt'], history: [] },
-  { speed: 50, baseY: 400, timeOffset: 3.7, rangeMin: 350, rangeMax: 550, colorKeys: ['darkNavy', 'prussian', 'cobalt'], history: [] },
+  { speed: 80, baseY: 218, timeOffset: 3.2, driftRange: 6,  colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
+  { speed: 70, baseY: 255, timeOffset: 0.0, driftRange: 7,  colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
+  { speed: 50, baseY: 288, timeOffset: 4.7, driftRange: 8,  colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
+  { speed: 60, baseY: 322, timeOffset: 1.8, driftRange: 9,  colorKeys: ['prussian', 'cobalt', 'blue'],     filled: true, history: [] },
+  { speed: 50, baseY: 360, timeOffset: 2.5, driftRange: 10, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
+  { speed: 40, baseY: 370, timeOffset: 5.8, driftRange: 10, colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
+  { speed: 45, baseY: 405, timeOffset: 1.1, driftRange: 12, colorKeys: ['darkNavy', 'prussian', 'cobalt'], history: [] },
+  { speed: 50, baseY: 400, timeOffset: 3.7, driftRange: 12, colorKeys: ['darkNavy', 'prussian', 'cobalt'], history: [] },
 ];
 
 // 每隔多少像素采样一个波浪点。数值越小，曲线越细腻但计算更多。
@@ -35,7 +35,7 @@ const noiseScale = 0.003;
 
 // 将 noise 的 0-1 输出放大成实际波浪高度。
 // Multiplies the 0-1 noise output into visible wave height.
-const waveAmplitude = 150;
+const baseWaveAmplitude = 150;
 
 // 前景浪拖影保留的历史帧数。
 // Number of historical foreground-wave states kept for trails.
@@ -43,20 +43,16 @@ const trailLength = 135;
 
 function updatePerlinWaveLines(currentTime) {
   for (const waveLine of waveLines) {
-    // 用 Perlin noise 生成每条浪的整体上下偏移。
-    // Use Perlin noise to generate each wave line's overall vertical offset.
+    // 用 Perlin noise 生成每条浪很小的整体上下漂移。
+    // Use Perlin noise to generate a small vertical drift for each wave line.
     //
     // timeOffset 让每条浪从不同噪声位置开始，speed 让每条浪变化速度不同。
     // timeOffset starts each wave at a different noise position, while speed gives each wave a different motion rate.
     const noiseValue = noise(waveLine.timeOffset * 5.0, currentTime * waveLine.speed * 0.007);
 
-    // map 把 noise 值转换到该浪允许的 y 范围，再用 constrain 保证不会越界。
-    // map converts the noise value into this wave's allowed y-range, then constrain keeps it inside that range.
-    const mappedY = constrain(map(noiseValue, 0.25, 0.75, waveLine.rangeMin, waveLine.rangeMax), waveLine.rangeMin, waveLine.rangeMax);
-
-    // offset 是相对 baseY 的偏移，后面绘制时会用 baseY + offset 得到实际位置。
-    // offset is relative to baseY; drawing later uses baseY + offset as the actual position.
-    waveLine.offset = mappedY - waveLine.baseY;
+    // offset 是相对 baseY 的小幅偏移。这样浪的形状会流动，但整片海不会像电梯一样上下移动。
+    // offset is a small displacement from baseY, so the wave shape flows without the whole sea moving like an elevator.
+    waveLine.offset = map(noiseValue, 0, 1, -waveLine.driftRange, waveLine.driftRange);
 
     // 记录当前状态，用于画拖影。这里保存 currentTime 是为了之后重画当时的 noise 形状。
     // Record the current state for trails. currentTime is saved so the old noise shape can be redrawn later.
@@ -99,6 +95,44 @@ function drawWaveLineLayers(centerY, timeOffset, alpha, colorKeys, currentTime, 
   // 先根据当前时间和位置生成这条浪的采样点。
   // First generate this wave's sampled points from the current time and position.
   const samples = getWaveSamples(centerY, timeOffset, currentTime);
+  let fftMultiplier = 1;
+
+if (centerY < 280) {
+
+  fftMultiplier =
+    map(
+      bassEnergy,
+      0,
+      255,
+      0.9,
+      1.35
+    );
+
+}
+else if (centerY < 360) {
+
+  fftMultiplier =
+    map(
+      midEnergy,
+      0,
+      255,
+      0.9,
+      1.25
+    );
+
+}
+else {
+
+  fftMultiplier =
+    map(
+      trebleEnergy,
+      0,
+      255,
+      0.9,
+      1.15
+    );
+
+}
   const lastSample = samples[samples.length - 1];
 
   if (filled) {
@@ -109,9 +143,9 @@ function drawWaveLineLayers(centerY, timeOffset, alpha, colorKeys, currentTime, 
     fill(red(fillColor), green(fillColor), blue(fillColor), alpha * 0.5);
     beginShape();
     vertex(-50, 700);
-    curveVertex(samples[0].x, centerY + samples[0].n * waveAmplitude);
-    for (const s of samples) curveVertex(s.x, centerY + s.n * waveAmplitude);
-    curveVertex(lastSample.x, centerY + lastSample.n * waveAmplitude);
+    curveVertex(samples[0].x, centerY + samples[0].n * baseWaveAmplitude * waveHeightMultiplier * fftMultiplier);
+    for (const s of samples) curveVertex(s.x, centerY + s.n * baseWaveAmplitude * waveHeightMultiplier * fftMultiplier);
+    curveVertex(lastSample.x, centerY + lastSample.n * baseWaveAmplitude * waveHeightMultiplier * fftMultiplier);
     vertex(lastSample.x + 50, 700);
     endShape(CLOSE);
   }
@@ -134,8 +168,12 @@ function drawWaveLineLayers(centerY, timeOffset, alpha, colorKeys, currentTime, 
     // curveVertex 会生成平滑曲线。开头和结尾额外给点可以让边缘更自然。
     // curveVertex creates a smooth curve. Extra start/end points make the edges behave more naturally.
     curveVertex(-50, layerY);
-    for (const s of samples) curveVertex(s.x, layerY + s.n * waveAmplitude);
-    curveVertex(lastSample.x, layerY + lastSample.n * waveAmplitude);
+    for (const s of samples) curveVertex(s.x, layerY + s.n * baseWaveAmplitude *
+waveHeightMultiplier *
+fftMultiplier);
+    curveVertex(lastSample.x, layerY + lastSample.n * baseWaveAmplitude *
+waveHeightMultiplier *
+fftMultiplier);
     endShape();
   }
 }
@@ -153,9 +191,9 @@ function drawBackgroundWaveBand(centerY, timeOffset, alpha, colorKeys, currentTi
   noStroke();
   beginShape();
   vertex(-50, 700);
-  curveVertex(samples[0].x, centerY + samples[0].n * waveAmplitude);
-  for (const s of samples) curveVertex(s.x, centerY + s.n * waveAmplitude);
-  curveVertex(lastSample.x, centerY + lastSample.n * waveAmplitude);
+  curveVertex(samples[0].x, centerY + samples[0].n * baseWaveAmplitude * waveHeightMultiplier);
+  for (const s of samples) curveVertex(s.x, centerY + s.n * baseWaveAmplitude * waveHeightMultiplier);
+  curveVertex(lastSample.x, centerY + lastSample.n * baseWaveAmplitude * waveHeightMultiplier);
   vertex(lastSample.x + 50, 700);
   endShape(CLOSE);
 
@@ -168,8 +206,8 @@ function drawBackgroundWaveBand(centerY, timeOffset, alpha, colorKeys, currentTi
     stroke(red(lineColor), green(lineColor), blue(lineColor), alpha);
     beginShape();
     curveVertex(-50, centerY + i * 7);
-    for (const s of samples) curveVertex(s.x, centerY + i * 7 + s.n * waveAmplitude);
-    curveVertex(lastSample.x, centerY + i * 7 + lastSample.n * waveAmplitude);
+    for (const s of samples) curveVertex(s.x, centerY + i * 7 + s.n * baseWaveAmplitude * waveHeightMultiplier);
+    curveVertex(lastSample.x, centerY + i * 7 + lastSample.n * baseWaveAmplitude * waveHeightMultiplier);
     endShape();
   }
 }
@@ -183,12 +221,26 @@ function drawPerlinSunRays(centerX, sunCenterY, sunRadius, currentTime) {
   for (let angle = HALF_PI; angle < HALF_PI + TWO_PI; angle += 0.052) {
     const flicker = noise(angle * 0.8, currentTime * 1.5);
 
-    stroke(232, 77, 28, flicker * 180);
+    stroke(
+      232,
+      77,
+      28,
+      flicker * 180 * sunGlowMultiplier
+    );
+
     line(
       centerX,
       sunCenterY,
-      centerX + cos(angle) * (sunRadius * 2.0 + flicker * sunRadius * 0.9),
-      sunCenterY + sin(angle) * (sunRadius * 2.0 + flicker * sunRadius * 0.9)
+      centerX + cos(angle) * (sunRadius * 2.0 +
+        flicker *
+        sunRadius *
+        0.9 *
+        sunGlowMultiplier),
+      sunCenterY + sin(angle) * (sunRadius * 2.0 +
+        flicker *
+        sunRadius *
+        0.9 *
+        sunGlowMultiplier)
     );
   }
 }
