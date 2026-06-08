@@ -18,11 +18,11 @@ const waveLines = [
   { speed: 80, baseY: 218, timeOffset: 3.2, rangeMin: 300, rangeMax: 400, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
   { speed: 70, baseY: 255, timeOffset: 0.0, rangeMin: 310, rangeMax: 400, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
   { speed: 50, baseY: 288, timeOffset: 4.7, rangeMin: 310, rangeMax: 450, colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
-  { speed: 60, baseY: 322, timeOffset: 1.8, rangeMin: 320, rangeMax: 480, colorKeys: ['prussian', 'cobalt', 'blue'],     filled: true, history: [] },
-  { speed: 50, baseY: 360, timeOffset: 2.5, rangeMin: 330, rangeMax: 470, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
-  { speed: 40, baseY: 370, timeOffset: 5.8, rangeMin: 340, rangeMax: 520, colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
-  { speed: 45, baseY: 405, timeOffset: 1.1, rangeMin: 340, rangeMax: 520, colorKeys: ['darkNavy', 'prussian', 'cobalt'], history: [] },
-  { speed: 50, baseY: 400, timeOffset: 3.7, rangeMin: 350, rangeMax: 550, colorKeys: ['darkNavy', 'prussian', 'cobalt'], history: [] },
+  { speed: 60, baseY: 322, timeOffset: 1.8, rangeMin: 330, rangeMax: 480, colorKeys: ['prussian', 'cobalt', 'blue'],     filled: true, history: [] },
+  { speed: 50, baseY: 360, timeOffset: 2.5, rangeMin: 350, rangeMax: 470, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
+  { speed: 40, baseY: 370, timeOffset: 5.8, rangeMin: 350, rangeMax: 520, colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
+  { speed: 45, baseY: 405, timeOffset: 1.1, rangeMin: 360, rangeMax: 520, colorKeys: ['darkNavy', 'prussian', 'cobalt'], history: [] },
+  { speed: 50, baseY: 400, timeOffset: 3.7, rangeMin: 370, rangeMax: 550, colorKeys: ['darkNavy', 'prussian', 'cobalt'], history: [] },
 ];
 
 // 每隔多少像素采样一个波浪点。数值越小，曲线越细腻但计算更多。
@@ -144,7 +144,7 @@ else {
     // Fill the area below the curve all the way to the bottom of the canvas, giving this wave a solid body of water instead of only showing its outlines.
     const fillColor = waveColors[colorKeys[0]];
     noStroke();
-    fill(red(fillColor), green(fillColor), blue(fillColor), alpha * 0.5);
+    fill(red(fillColor), green(fillColor), blue(fillColor), alpha * 0.75);
     beginShape();
     vertex(-50, 700);
     curveVertex(samples[0].x, centerY + samples[0].n * baseWaveAmplitude * waveHeightMultiplier * fftMultiplier);
