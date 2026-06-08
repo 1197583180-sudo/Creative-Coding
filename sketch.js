@@ -1,3 +1,7 @@
+function preload() {
+  preloadFish();
+}
+
 function setup() {
   // p5 会在页面加载后自动调用 setup。这里交给 artwork-base.js 完成基础初始化。
   // p5 automatically calls setup after the page loads. The base initialization is handled in artwork-base.js.
@@ -15,6 +19,7 @@ function draw() {
   // 更新时间，并把同一份时间传给 time-based 和 Perlin mechanic。
   // Update time, then pass the same timing values to the time-based and Perlin mechanics.
   const deltaSeconds = updateMechanicTime();
+  updateWaveBoost();
   updatePerlinWaveLines(noiseTime);
   updateTimeDrivenBackgroundLines(deltaSeconds, noiseTime);
 
@@ -80,6 +85,10 @@ function draw() {
   // 最后画剩下的浪，让它们覆盖在大船前方，制造遮挡层次。
   // Draw the remaining waves last, so they cover the front of the large boat and create occlusion depth.
   for (let i = 3; i < waveLines.length; i++) drawWaveLine(waveLines[i]);
+
+  // 绘制从水面跳跃的小鱼（在最顶层，覆盖海浪）。
+  // Draw jumping fish on top of everything else.
+  updateAndDrawFish(deltaSeconds);
 
   pop();
 }

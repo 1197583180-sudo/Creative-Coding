@@ -105,7 +105,7 @@ function drawWaveLineLayers(centerY, timeOffset, alpha, colorKeys, currentTime) 
     // curveVertex 会生成平滑曲线。开头和结尾额外给点可以让边缘更自然。
     // curveVertex creates a smooth curve. Extra start/end points make the edges behave more naturally.
     curveVertex(-50, layerY);
-    for (const s of samples) curveVertex(s.x, layerY + s.n * waveAmplitude);
+    for (const s of samples) curveVertex(s.x, layerY + s.n * getTotalWaveAmplitude());
     curveVertex(lastSample.x, layerY + lastSample.n * waveAmplitude);
     endShape();
   }
