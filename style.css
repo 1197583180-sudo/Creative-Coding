@@ -1,0 +1,31 @@
+/*
+  页面和 body 都去掉默认边距，让 p5 canvas 可以真正贴齐窗口边缘。
+  Remove default margins from the page and body so the p5 canvas can touch the window edges.
+*/
+html, body {
+  margin: 0;
+  padding: 0;
+
+  /*
+    在 canvas 加载前或透明区域背后显示白色背景。
+    Show a white background before the canvas loads or behind transparent areas.
+  */
+  background-color: #ffffff;
+
+  /*
+    隐藏滚动条。作品使用全屏 canvas，不需要页面滚动。
+    Hide scrollbars. The artwork uses a full-screen canvas, so page scrolling is not needed.
+  */
+  overflow: hidden;
+}
+
+/*
+  p5 创建的 canvas 默认可能像行内元素一样留出细小空隙。
+  display: block 可以消除这类空隙，让画布更稳定地全屏显示。
+
+  The canvas created by p5 may otherwise behave like an inline element and leave a tiny gap.
+  display: block removes that gap and helps the canvas fill the screen reliably.
+*/
+canvas {
+  display: block;
+}
