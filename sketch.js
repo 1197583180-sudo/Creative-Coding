@@ -1,7 +1,8 @@
 function setup() {
-  // p5 会在页面加载后自动调用 setup。这里交给 artwork-base.js 完成基础初始化。
-  // p5 automatically calls setup after the page loads. The base initialization is handled in artwork-base.js.
+  // p5 会在页面加载后自动调用 setup。这里依次完成画布基础初始化和各 mechanic 的数据准备。
+  // p5 automatically calls setup after the page loads. This sets up the canvas base, then prepares each mechanic's data.
   setupArtworkBase();
+  setupWaveColors();
 }
 
 function draw() {
@@ -75,7 +76,7 @@ function draw() {
 
   // 再画大船，让它位于部分海浪之间。
   // Draw the large boat next, placing it between wave layers.
-  drawTimeDrivenBoat(650, 400, 260);
+  drawTimeDrivenBoat(650, 400, 260, 1, 1.6);
 
   // 最后画剩下的浪，让它们覆盖在大船前方，制造遮挡层次。
   // Draw the remaining waves last, so they cover the front of the large boat and create occlusion depth.

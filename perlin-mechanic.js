@@ -1,3 +1,17 @@
+// 存放整件作品会重复使用的海浪颜色，由 Perlin noise 驱动的浪和背景浪共用。
+// Stores reusable wave colors shared by the Perlin-noise-driven waves and the background wave.
+let waveColors;
+
+function setupWaveColors() {
+  waveColors = {
+    darkNavy : color('#021036'),
+    prussian : color('#0B409C'),
+    cobalt   : color('#0A7BC4'),
+    blue     : color('#10B4E0'),
+    skyBlue  : color('#48CCE8'),
+  };
+}
+
 // 前景海浪的数据。每个对象代表一条独立的波浪线。
 // Foreground wave data. Each object represents one independent wave line.
 const waveLines = [
