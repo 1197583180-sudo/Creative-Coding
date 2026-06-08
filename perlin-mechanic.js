@@ -1,12 +1,12 @@
 // 前景海浪的数据。每个对象代表一条独立的波浪线。
 // Foreground wave data. Each object represents one independent wave line.
 const waveLines = [
-  { speed: 38, baseY: 218, timeOffset: 3.2, rangeMin: 290, rangeMax: 420, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
-  { speed: 45, baseY: 255, timeOffset: 0.0, rangeMin: 290, rangeMax: 420, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
-  { speed: 30, baseY: 288, timeOffset: 4.7, rangeMin: 280, rangeMax: 450, colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
-  { speed: 36, baseY: 322, timeOffset: 1.8, rangeMin: 300, rangeMax: 480, colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
-  { speed: 35, baseY: 360, timeOffset: 2.5, rangeMin: 320, rangeMax: 450, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
-  { speed: 40, baseY: 370, timeOffset: 5.8, rangeMin: 300, rangeMax: 500, colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
+  { speed: 80, baseY: 218, timeOffset: 3.2, rangeMin: 290, rangeMax: 400, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
+  { speed: 70, baseY: 255, timeOffset: 0.0, rangeMin: 290, rangeMax: 400, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
+  { speed: 30, baseY: 288, timeOffset: 4.7, rangeMin: 310, rangeMax: 450, colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
+  { speed: 36, baseY: 322, timeOffset: 1.8, rangeMin: 320, rangeMax: 480, colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
+  { speed: 35, baseY: 360, timeOffset: 2.5, rangeMin: 330, rangeMax: 450, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
+  { speed: 40, baseY: 370, timeOffset: 5.8, rangeMin: 340, rangeMax: 500, colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
   { speed: 45, baseY: 405, timeOffset: 1.1, rangeMin: 340, rangeMax: 520, colorKeys: ['darkNavy', 'prussian', 'cobalt'], history: [] },
   { speed: 50, baseY: 400, timeOffset: 3.7, rangeMin: 350, rangeMax: 550, colorKeys: ['darkNavy', 'prussian', 'cobalt'], history: [] },
 ];
