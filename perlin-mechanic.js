@@ -15,12 +15,12 @@ function setupWaveColors() {
 // 前景海浪的数据。每个对象代表一条独立的波浪线。
 // Foreground wave data. Each object represents one independent wave line.
 const waveLines = [
-  { speed: 80, baseY: 218, timeOffset: 3.2, rangeMin: 290, rangeMax: 400, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
-  { speed: 70, baseY: 255, timeOffset: 0.0, rangeMin: 290, rangeMax: 400, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
-  { speed: 30, baseY: 288, timeOffset: 4.7, rangeMin: 310, rangeMax: 450, colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
-  { speed: 36, baseY: 322, timeOffset: 1.8, rangeMin: 320, rangeMax: 480, colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
-  { speed: 35, baseY: 360, timeOffset: 2.5, rangeMin: 330, rangeMax: 450, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
-  { speed: 40, baseY: 370, timeOffset: 5.8, rangeMin: 340, rangeMax: 500, colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
+  { speed: 80, baseY: 218, timeOffset: 3.2, rangeMin: 300, rangeMax: 400, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
+  { speed: 70, baseY: 255, timeOffset: 0.0, rangeMin: 310, rangeMax: 400, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
+  { speed: 50, baseY: 288, timeOffset: 4.7, rangeMin: 310, rangeMax: 450, colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
+  { speed: 60, baseY: 322, timeOffset: 1.8, rangeMin: 320, rangeMax: 480, colorKeys: ['prussian', 'cobalt', 'blue'],     filled: true, history: [] },
+  { speed: 50, baseY: 360, timeOffset: 2.5, rangeMin: 330, rangeMax: 470, colorKeys: ['cobalt', 'blue', 'skyBlue'],      history: [] },
+  { speed: 40, baseY: 370, timeOffset: 5.8, rangeMin: 340, rangeMax: 520, colorKeys: ['prussian', 'cobalt', 'blue'],     history: [] },
   { speed: 45, baseY: 405, timeOffset: 1.1, rangeMin: 340, rangeMax: 520, colorKeys: ['darkNavy', 'prussian', 'cobalt'], history: [] },
   { speed: 50, baseY: 400, timeOffset: 3.7, rangeMin: 350, rangeMax: 550, colorKeys: ['darkNavy', 'prussian', 'cobalt'], history: [] },
 ];
@@ -95,11 +95,26 @@ function getWaveSamples(centerY, timeOffset, currentTime, verticalNoiseScale = 0
   return samples;
 }
 
-function drawWaveLineLayers(centerY, timeOffset, alpha, colorKeys, currentTime) {
+function drawWaveLineLayers(centerY, timeOffset, alpha, colorKeys, currentTime, filled = false) {
   // 先根据当前时间和位置生成这条浪的采样点。
   // First generate this wave's sampled points from the current time and position.
   const samples = getWaveSamples(centerY, timeOffset, currentTime);
   const lastSample = samples[samples.length - 1];
+
+  if (filled) {
+    // 把曲线以下的区域填满到画面最底部，让这条浪呈现实心的水体效果，而不是只露出线条。
+    // Fill the area below the curve all the way to the bottom of the canvas, giving this wave a solid body of water instead of only showing its outlines.
+    const fillColor = waveColors[colorKeys[0]];
+    noStroke();
+    fill(red(fillColor), green(fillColor), blue(fillColor), alpha * 0.5);
+    beginShape();
+    vertex(-50, 700);
+    curveVertex(samples[0].x, centerY + samples[0].n * waveAmplitude);
+    for (const s of samples) curveVertex(s.x, centerY + s.n * waveAmplitude);
+    curveVertex(lastSample.x, centerY + lastSample.n * waveAmplitude);
+    vertex(lastSample.x + 50, 700);
+    endShape(CLOSE);
+  }
 
   strokeWeight(1);
   noFill();

@@ -67,7 +67,7 @@ function draw() {
 
     // 最后画当前状态，透明度最高，所以当前海浪最清晰。
     // Finally draw the current state at full opacity, making the current wave the clearest.
-    drawWaveLineLayers(waveLine.baseY + waveLine.offset, waveLine.timeOffset, 255, waveLine.colorKeys, noiseTime);
+    drawWaveLineLayers(waveLine.baseY + waveLine.offset, waveLine.timeOffset, 255, waveLine.colorKeys, noiseTime, waveLine.filled);
   };
 
   // 先画前三条浪，作为大船后方的海面。
@@ -76,7 +76,7 @@ function draw() {
 
   // 再画大船，让它位于部分海浪之间。
   // Draw the large boat next, placing it between wave layers.
-  drawTimeDrivenBoat(650, 400, 260, 1, 1.6);
+  drawTimeDrivenBoat(650, 410, 260, 1, 1.6, 15);
 
   // 最后画剩下的浪，让它们覆盖在大船前方，制造遮挡层次。
   // Draw the remaining waves last, so they cover the front of the large boat and create occlusion depth.

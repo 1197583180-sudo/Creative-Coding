@@ -153,16 +153,16 @@ function drawBoat(x, y, boatWidth) {
   drawHull();
 }
 
-function drawTimeDrivenBoat(baseX, baseY, boatWidth, direction = 1, speed = 1) {
+function drawTimeDrivenBoat(baseX, baseY, boatWidth, direction = 1, speed = 1, verticalRange = 18) {
   // boatPhase 是船的动画相位。它由 noiseTime 推进，speed 可以让单独某条船浮动得更快或更慢。
   // boatPhase is the animation phase for the boat. It is driven by noiseTime, and speed lets an individual boat float faster or slower.
   const boatPhase = noiseTime * 2 * speed;
 
   push();
 
-  // cos 控制左右漂移，sin 控制上下漂浮。direction 用来让不同船只运动方向有差异。
-  // cos controls horizontal drifting, while sin controls vertical bobbing. direction makes different boats move differently.
-  translate(baseX + cos(boatPhase * 0.5) * 55 * direction, baseY + sin(boatPhase) * 18 * direction);
+  // cos 控制左右漂移，sin 控制上下漂浮，漂浮幅度由 verticalRange 决定。direction 用来让不同船只运动方向有差异。
+  // cos controls horizontal drifting, while sin controls vertical bobbing whose amplitude is set by verticalRange. direction makes different boats move differently.
+  translate(baseX + cos(boatPhase * 0.5) * 55 * direction, baseY + sin(boatPhase) * verticalRange * direction);
 
   // 让船随时间轻微倾斜，模拟被浪托起和放下的感觉。
   // Slightly rotate the boat over time to suggest it being lifted and lowered by waves.
