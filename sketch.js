@@ -1,8 +1,13 @@
+function preload() {
+  preloadAudio();
+}
+
 function setup() {
   // p5 会在页面加载后自动调用 setup。这里依次完成画布基础初始化和各 mechanic 的数据准备。
   // p5 automatically calls setup after the page loads. This sets up the canvas base, then prepares each mechanic's data.
   setupArtworkBase();
   setupWaveColors();
+  setupAudioMechanic();
 }
 
 function draw() {
@@ -11,6 +16,8 @@ function draw() {
 
   // 每帧先重画背景，避免上一帧的图像残留。
   // Redraw the background first each frame to prevent previous-frame artifacts.
+
+  updateAudioMechanic();
   drawBackgroundGradient();
 
   // 更新时间，并把同一份时间传给 time-based 和 Perlin mechanic。
@@ -83,4 +90,8 @@ function draw() {
   for (let i = 3; i < waveLines.length; i++) drawWaveLine(waveLines[i]);
 
   pop();
+}
+
+function mousePressed() {
+  startAudioMechanic();
 }
