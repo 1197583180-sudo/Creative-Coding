@@ -31,16 +31,6 @@ function preloadAudio() {
   soundFormats('mp3');
 
   audioButtonImg = loadImage('images/blue_music_button.png');
-
-  for (let i = 1; i <= 4; i++) {
-    splashSounds.push(
-      loadSound(
-        `audio/splash${i}.mp3`,
-        () => console.log(`splash${i} loaded`),
-        err => console.error(`splash${i} failed`, err)
-      )
-    );
-  }
 }
 // -----------------------------------------------------
 
@@ -76,6 +66,28 @@ function setupAudioMechanic() {
   sunAmp = new p5.Amplitude();
 
   waveFFT = new p5.FFT(0.8, 1024);
+
+  const splashPaths = [
+    'audio/splash.mp3',
+    'audio/splash2.mp3',
+    'audio/splash3.mp3',
+    'audio/splash4.mp3'
+  ];
+
+  for (let i = 0; i < splashPaths.length; i++) {
+    const path = splashPaths[i];
+    splashSounds.push(
+      loadSound(
+        path,
+        function () {
+          console.log(path + ' loaded');
+        },
+        function (err) {
+          console.error(path + ' failed', err);
+        }
+      )
+    );
+  }
 
   sunSound = loadSound(
     'audio/sun.mp3',
