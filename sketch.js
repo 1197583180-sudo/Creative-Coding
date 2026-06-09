@@ -9,6 +9,7 @@ function setup() {
   setupArtworkBase();
   setupWaveColors();
   setupTimeBasedClouds();
+  setupTimeBasedBirds();
   setupAudioMechanic();
 }
 
@@ -27,12 +28,14 @@ function draw() {
   // Update time, then pass the same timing values to the time-based and Perlin mechanics.
   const deltaSeconds = updateMechanicTime();
   updateTimeBasedClouds(deltaSeconds);
+  updateTimeBasedBirds(deltaSeconds);
   updatePerlinWaveLines(noiseTime);
   updateTimeDrivenBackgroundLines(deltaSeconds, noiseTime);
 
-  // 云朵画在背景渐变之后、山和太阳之前，让它们停留在天空层。
-  // Clouds are drawn after the background gradient and before the mountain/sun, keeping them in the sky layer.
+  // 云朵和小鸟画在背景渐变之后、山和太阳之前，让它们停留在天空层。
+  // Clouds and birds are drawn after the background gradient and before the mountain/sun, keeping them in the sky layer.
   drawTimeBasedClouds();
+  drawTimeBasedBirds();
 
   // 山和太阳先画，后面的海浪会盖在它们前面，形成远近层次。
   // Draw the mountain and sun first, so later waves appear in front and create depth.

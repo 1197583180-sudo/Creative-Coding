@@ -29,6 +29,33 @@ const timeBasedClouds = [
   { x: 920,  y: 150, scale: 0.58, speed: 8,  alpha: 132, delay: 2.6, wait: 0 },
 ];
 
+// 海鸥群的飞行和等待时长。9 秒慢速飞行并淡入淡出，3 秒等待后重来。
+// Flight and waiting durations for the seagull flock: 9 seconds of slow flight with fade-in/out, then 3 seconds waiting.
+const birdFlockFlightDuration = 9;
+const birdFlockWaitDuration = 3;
+
+// 海鸥群轨迹，使用 1000 x 500 设计坐标。位置在山体和太阳左侧天空区域。
+// Flock path in the 1000 x 500 design coordinate system, placed in the sky left of the mountain and sun.
+const birdFlockStart = { x: 470, y: 255 };
+const birdFlockEnd = { x: 210, y: 140 };
+
+// 参考图风格的固定海鸥编队。每只海鸥只保存相对位置、大小和翅膀相位差，不使用 random()。
+// Fixed seagull formation in the reference style. Each bird stores only relative position, size, and wing phase offset; no random() is used.
+const timeBasedBirdFlock = [
+  { ox: -90, oy: -8,  scale: 0.56, phaseOffset: 0.1, wingSpeed: 5.8, variant: 0 },
+  { ox: -54, oy: -36, scale: 0.44, phaseOffset: 1.0, wingSpeed: 6.2, variant: 1 },
+  { ox: -20, oy: 18,  scale: 0.50, phaseOffset: 2.1, wingSpeed: 5.5, variant: 2 },
+  { ox: 22,  oy: -6,  scale: 0.42, phaseOffset: 2.8, wingSpeed: 6.6, variant: 0 },
+  { ox: 62,  oy: 22,  scale: 0.46, phaseOffset: 3.4, wingSpeed: 5.9, variant: 1 },
+  { ox: 104, oy: -18, scale: 0.40, phaseOffset: 4.0, wingSpeed: 6.4, variant: 2 },
+  { ox: 142, oy: 8,   scale: 0.48, phaseOffset: 4.8, wingSpeed: 5.7, variant: 0 },
+];
+
+// 海鸥群计时状态。flying 期间移动和淡出；waiting 期间隐藏并倒计时。
+// Timer state for the flock. During flying it moves and fades; during waiting it is hidden and counts down.
+let birdFlockState = 'flying';
+let birdFlockTimer = 0;
+
 function setupTimeBasedClouds() {
   // 根据设计画布宽度把云分散到天空中，避免页面刚开始时所有云都挤在一起。
   // Spread clouds across the design canvas width so they do not start clustered together.
@@ -39,6 +66,13 @@ function setupTimeBasedClouds() {
     cloud.texture = createTimeBasedCloudTexture(i);
     cloud.visualWidth = cloud.texture.width;
   }
+}
+
+function setupTimeBasedBirds() {
+  // 初始化海鸥群循环：从 flying 状态的第 0 秒开始。
+  // Initialize the flock loop: start at second 0 of the flying state.
+  birdFlockState = 'flying';
+  birdFlockTimer = 0;
 }
 
 function updateTimeBasedClouds(deltaSeconds) {
@@ -61,6 +95,24 @@ function updateTimeBasedClouds(deltaSeconds) {
       cloud.x = -cloudWidth;
       cloud.wait = cloud.delay;
     }
+  }
+}
+
+function updateTimeBasedBirds(deltaSeconds) {
+  // 只用 deltaSeconds 推进状态计时器：飞行 5 秒，等待 3 秒。
+  // Advance the state timer only with deltaSeconds: 5 seconds flying, 3 seconds waiting.
+  birdFlockTimer += deltaSeconds;
+
+  if (birdFlockState === 'flying' && birdFlockTimer >= birdFlockFlightDuration) {
+    // 飞行事件结束后切换到等待事件。
+    // After the flight event ends, switch to the waiting event.
+    birdFlockState = 'waiting';
+    birdFlockTimer = 0;
+  } else if (birdFlockState === 'waiting' && birdFlockTimer >= birdFlockWaitDuration) {
+    // 等待结束后重置回左下起点，开始下一轮飞行。
+    // After waiting, reset to the lower-left start and begin the next flight.
+    birdFlockState = 'flying';
+    birdFlockTimer = 0;
   }
 }
 
@@ -160,6 +212,115 @@ function drawSingleTimeBasedCloud(cloud) {
   tint(255, cloud.alpha);
   image(cloud.texture, 0, 0);
   noTint();
+
+  pop();
+}
+
+function drawTaperedWingStroke(x1, y1, cx1, cy1, cx2, cy2, x2, y2, alpha, baseWeight = 2.2) {
+  // 用分段线模拟笔触粗细变化：两端细，中段略粗，更接近参考图中的手绘海鸥线条。
+  // Simulate changing brush thickness with segmented lines: thin ends and a thicker middle, closer to the hand-drawn gull strokes in the reference.
+  const steps = 12;
+  strokeCap(ROUND);
+  strokeJoin(ROUND);
+
+  for (let i = 0; i < steps; i++) {
+    const t1 = i / steps;
+    const t2 = (i + 1) / steps;
+    const mid = (t1 + t2) * 0.5;
+    const taper = sin(PI * mid);
+    const xA = bezierPoint(x1, cx1, cx2, x2, t1);
+    const yA = bezierPoint(y1, cy1, cy2, y2, t1);
+    const xB = bezierPoint(x1, cx1, cx2, x2, t2);
+    const yB = bezierPoint(y1, cy1, cy2, y2, t2);
+
+    strokeWeight(baseWeight * (0.38 + taper * 0.82));
+    stroke(32, 24, 20, alpha * (0.72 + taper * 0.28));
+    line(xA, yA, xB, yB);
+  }
+}
+
+function drawSmallBodyStroke(alpha, bodyTilt = 0) {
+  // 参考图里的海鸥不是完整鸟身，而是中心几笔短线暗示身体、头部和翼根。
+  // In the reference, the gull body is not fully drawn; a few short central strokes suggest body, head, and wing root.
+  push();
+  rotate(bodyTilt);
+  stroke(32, 24, 20, alpha * 0.82);
+  strokeWeight(1.25);
+  strokeCap(ROUND);
+  line(-4, 1, 5, 1);
+  strokeWeight(0.95);
+  pop();
+}
+
+function drawSingleTimeBasedBird(bird, alpha, groupPhase) {
+  const wingPhase = groupPhase * bird.wingSpeed + bird.phaseOffset;
+  const flap = sin(wingPhase);
+  const wingLift = map(flap, -1, 1, -2.5, 3.5);
+
+  push();
+  translate(bird.ox, bird.oy + sin(wingPhase * 0.35) * 2);
+  scale(bird.scale);
+
+  // 参考图风格：远景海鸥由多段有粗细变化的深色笔触构成，不画实体鸟身。
+  // Reference style: distant seagulls are built from several dark tapered strokes, without solid bodies.
+  noFill();
+
+  if (bird.variant === 1) {
+    // variant 1 是较窄的姿态，翅膀长度与当前 scale 一起缩放，保持大小关系一致。
+    // Variant 1 is a narrower pose; wing length scales with the bird's current scale, keeping proportions consistent.
+    drawTaperedWingStroke(-24, 5, -17, -2 - wingLift, -8, -7 - wingLift, 0, 0, alpha, 1.85);
+    drawTaperedWingStroke(0, 0, 7, -7 - wingLift, 17, -5 - wingLift, 27, 3, alpha, 1.75);
+    drawSmallBodyStroke(alpha, radians(-4));
+  } else if (bird.variant === 2) {
+    // variant 2 模拟参考图中一侧较平、一侧上扬的自然姿态。
+    // Variant 2 imitates the reference's natural pose with one flatter wing and one lifted wing.
+    drawTaperedWingStroke(-27, 4, -18, 1 - wingLift, -8, -1 - wingLift, 0, 0, alpha, 1.95);
+    drawTaperedWingStroke(0, 0, 8, -10 - wingLift, 20, -12 - wingLift, 32, -1, alpha, 1.9);
+    drawSmallBodyStroke(alpha, radians(3));
+  } else {
+    // 默认姿态使用更长的两侧翅膀主笔触，并添加短副笔触，让轮廓更像参考图。
+    // The default pose uses longer main wing strokes plus short secondary strokes, making the outline closer to the reference.
+    drawTaperedWingStroke(-30, 5, -20, -6 - wingLift, -8, -9 - wingLift, 0, 0, alpha, 2.15);
+    drawTaperedWingStroke(0, 0, 9, -9 - wingLift, 22, -8 - wingLift, 34, 3, alpha, 2.05);
+    drawSmallBodyStroke(alpha, 0);
+  }
+
+  pop();
+}
+
+function drawTimeBasedBirds() {
+  // 小鸟与云朵使用同一套设计坐标系，因此窗口缩放时仍保持和天空构图一致。
+  // Birds share the same design coordinate system as clouds, so they stay aligned with the sky composition during resizing.
+  const artworkScale = max(width / artworkWidth, height / artworkHeight);
+  const artworkOffsetX = (width - artworkWidth * artworkScale) / 2;
+  const artworkOffsetY = (height - artworkHeight * artworkScale) / 2;
+
+  push();
+  translate(artworkOffsetX, artworkOffsetY);
+  scale(artworkScale);
+
+  if (birdFlockState === 'flying') {
+    // 9 秒飞行进度：0 在右下起点，1 在左上终点。
+    // Nine-second flight progress: 0 at the lower-right start, 1 at the upper-left end.
+    const progress = constrain(birdFlockTimer / birdFlockFlightDuration, 0, 1);
+    const flockX = lerp(birdFlockStart.x, birdFlockEnd.x, progress);
+    const flockY = lerp(birdFlockStart.y, birdFlockEnd.y, progress);
+
+    // 起飞阶段淡入，最后阶段淡出，避免海鸥群突然出现或消失。
+    // Fade in at takeoff and fade out near the end to avoid sudden appearance or disappearance.
+    const fadeIn = constrain(map(progress, 0.0, 0.16, 0, 1), 0, 1);
+    const fadeOut = constrain(map(progress, 0.84, 1.0, 1, 0), 0, 1);
+    const flockAlpha = 205 * fadeIn * fadeOut;
+
+    push();
+    translate(flockX, flockY);
+
+    for (const bird of timeBasedBirdFlock) {
+      drawSingleTimeBasedBird(bird, flockAlpha, birdFlockTimer);
+    }
+
+    pop();
+  }
 
   pop();
 }
