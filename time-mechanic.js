@@ -2,6 +2,7 @@
 // AI-assisted: this file was developed with the help of Claude Code (claude-sonnet-4-6, Anthropic).
 // AI assistance was used for the boat drawing system, tapered wing stroke technique, bird flock animation,
 // cloud rendering, and sun ring expansion tied to audio.
+// AI-assisted: ChatGPT/Codex was also used to refine the time-based clouds, seagull flock, boat passengers, and documentation alignment.
 
 // 全局时间变量：所有 time-based 动画都会读取或间接受它影响。
 // Global time variable: all time-based animations read from it or are indirectly driven by it.

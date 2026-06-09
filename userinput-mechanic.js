@@ -1,9 +1,10 @@
 // Interaction mechanic: spacebar intensifies waves; mouse click triggers fish jumps.
 // AI-assisted: this file was developed with the help of Claude Code (claude-sonnet-4-6, Anthropic).
 // AI assistance was used for the parabolic fish arc, lerp-based wave boost decay, and SVG blend mode rendering.
+// AI-assisted: ChatGPT/Codex was also used to debug the spacebar-to-wave connection and align this file with README documentation.
 
 // --- Spacebar: wave intensity ---
-// userInputWaveBoost is extra amplitude added on top of baseWaveAmplitude; it decays each frame.
+// waveBoostTarget jumps on spacebar, while waveBoostCurrent follows smoothly and decays over time.
 let waveBoostTarget  = 0;  // set to 1.0 on spacebar, then decays
 let waveBoostCurrent = 0;  // smoothly follows target via lerp
 
@@ -12,14 +13,14 @@ function keyPressed() {
 }
 
 // Same approach as audio mechanic: multiply waveHeightMultiplier (already set by audio this
-// frame) so perlin reads the boosted value. Lerp gives smooth rise; target decay gives smooth fall.
+// frame) so Perlin wave drawing reads the boosted value. Lerp gives smooth rise; target decay gives smooth fall.
 function updateWaveBoost() {
   waveBoostCurrent = lerp(waveBoostCurrent, waveBoostTarget, 0.12);
   waveBoostTarget  *= 0.96;
   if (waveBoostTarget < 0.001) waveBoostTarget = 0;
 
   if (waveBoostCurrent > 0.001) {
-    waveHeightMultiplier *= (1 - waveBoostCurrent * 1.0);
+    waveHeightMultiplier *= (1 + waveBoostCurrent * 1.0);
   }
 }
 
