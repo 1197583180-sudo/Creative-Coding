@@ -1,78 +1,101 @@
 # IDEA9103: Creative Coding Group Project
 
-**University of Sydney** | IDEA9103 Creative Coding
-**Team:** Joy, Lihang, Karina, Adinata
+**University of Sydney** | IDEA9103 Creative Coding Major Project
+**Team:** Joy (Siying Song), Lihang Shi, Karina Zhu, Adinata Harlan
 
 ---
 
-## Part 1: Project Direction
+## Inspiration
 
-### Artwork We Are Reinterpreting
-
-Our project reinterprets **"The Great Wave off Kanagawa"** (*神奈川沖浪裏*) by **Katsushika Hokusai** (c. 1831), one of the most iconic woodblock prints in the world. The composition captures a towering, claw-like wave at the moment of its peak — frothy white foam breaking into chaos, deep indigo water coiling with tremendous force, and the serene silhouette of Mount Fuji standing small in the background. Its power lies in contrast: explosive motion against absolute stillness, organic chaos against geometric calm.
+Our project reinterprets **"The Great Wave off Kanagawa"** (*神奈川沖浪裏*) by **Katsushika Hokusai** (c. 1831). The woodblock print captures a towering wave at the peak of its power — frothy white foam breaking into chaos, deep indigo water coiling with tremendous force, and the serene silhouette of Mount Fuji standing small in the background. Its power lies in contrast: explosive motion against absolute stillness, organic chaos against geometric calm.
 
 ![The Great Wave off Kanagawa by Katsushika Hokusai](images/wave-1.jpg)
 
-### Vision
-
-We reinterpret *The Great Wave off Kanagawa* by transforming its frozen moment of tension into a living, reactive artwork built in p5.js. Hokusai captured a single frame of the ocean at its most violent — we animate what came before and after that instant. Perlin noise drives the organic swell and roll of water across the canvas, sculpting wave forms that rise and fall like the sea itself; audio amplifies the surge, making the waves and sun pulse with sound; time governs the continuous rhythm of the ocean, keeping boats afloat and the sun alive even in silence; and user input gives the viewer agency to disturb the scene — summoning fish from the deep and surging the waves with a keystroke. Together, these four mechanics transform a still woodblock print into something fluid, musical, cyclical, and responsive — a wave that never quite breaks the same way twice.
+What inspired us was the idea that Hokusai froze the wave at one specific instant. We wanted to animate everything he *implied* — the wave before it broke, the ocean beneath it, the life inside it, the sound it would make. The ukiyo-e colour palette (prussian blue, cobalt, warm sky) and the layered woodblock printing technique shaped our decision to build wave colour through stacked, semi-transparent strokes rather than solid fills.
 
 ---
 
-## Part 2: Individual Mechanics
+## Mechanic Ownership
 
-### 🖱️ User Input (Joy)
+### User Input — Joy
 
-The User Input mechanic gives the viewer two ways to directly disturb the scene.
+The user input mechanic gives the viewer two ways to directly interact with the scene.
 
-**Mouse click — fish jumps:** Clicking anywhere in the lower ocean area of the canvas (the wave region) causes four fish to leap out of the water at random positions scattered across the ocean. Each fish follows a parabolic arc — rising from the surface and falling back in — with a slight stagger in timing between each one so the jumps feel natural rather than mechanical. The fish face random directions and appear at random horizontal and vertical positions within the ocean, so every click produces a different result.
+**Mouse click (ocean area) — fish jumps:** Clicking anywhere in the lower ocean area triggers four fish to leap from the water at random positions across the canvas. Each fish follows a parabolic arc and travels forward in the direction it is facing, with a slight stagger between each one. Fish positions, facing directions, and jump distances are all randomised per click.
 
-**Spacebar — wave surge:** Pressing the spacebar triggers an immediate boost to the wave amplitude, making all eight foreground wave lines surge visibly taller. The boost then decays smoothly back to its resting state over roughly two seconds, like a wave that peaks and subsides. This gives the viewer a sense of physical force over the ocean.
+**Spacebar — wave surge:** Pressing the spacebar adds an immediate amplitude boost to all eight wave lines, making them surge visibly taller. The boost decays smoothly back to rest over roughly two seconds.
 
----
-
-### ⏱️ Time-Based Mechanic (Lihang)
-
-The Time-Based mechanic keeps the artwork in constant motion without requiring any interaction from the viewer.
-
-**Two boats** float across the canvas, one small and distant in the background, one large in the foreground. Each bobs up and down and drifts slightly left and right following smooth sinusoidal paths driven by elapsed time. They are layered between different wave lines — the smaller boat sits behind all the foreground waves, while the larger boat weaves between the third and fourth wave layers, giving the scene genuine depth.
-
-**The sun** pulses gently in size over time and radiates three expanding light rings that fade as they grow outward, creating a continuous breathing effect that makes the sky feel alive.
-
-**The background wave band** drifts slowly up and down between a narrow range, leaving a faint motion trail that adds subtle atmospheric depth behind the foreground waves.
-
-All of this runs continuously from the moment the page loads, requiring no interaction.
+**Techniques:** Fish jump arcs use `sin(PI * progress)` to compute a parabolic vertical offset, combined with a linear horizontal offset so the fish travel forward in the direction they face. SVG fish images are loaded with `loadImage()` and drawn using `drawingContext.globalCompositeOperation = 'multiply'` to strip white backgrounds so they composite naturally against the ocean. The `keyPressed()` and `mousePressed()` p5.js event functions handle input, and a coordinate transform converts screen click positions into the 1000×500 design space to correctly detect ocean-area clicks.
 
 ---
 
-### 🎵 Audio Mechanic (Karina)
+### Time-Based Mechanic — Lihang
 
-The Audio mechanic connects two looping sound tracks to the visual elements of the artwork, so the scene responds to music in real time.
+The time-based mechanic keeps the artwork in continuous motion without any viewer interaction.
 
-**Starting audio:** A music button in the top-left corner of the canvas toggles playback — click once to start, click again to stop.
+**Two boats** float and bob along sinusoidal paths driven by elapsed time, layered between different wave lines to create depth. **The sun** pulses gently in size and radiates three expanding light rings that fade as they grow outward. When audio is active, the rings expand further and grow brighter in sync with the sun track's amplitude. **The background wave band** drifts slowly up and down, leaving a faint motion trail behind the foreground waves.
 
-**Wave response:** Two audio tracks play simultaneously — a wave ambient track and a sun ambient track. The wave track is analysed each frame using an FFT (frequency analyser). Bass frequencies control the overall wave height multiplier, making all waves surge taller when low-end energy is high. Each individual wave layer is additionally modulated by its own frequency band — upper waves react to bass, middle waves to mid frequencies, and lower waves to treble — so different parts of the ocean pulse at different rates depending on what the music is doing.
-
-**Sun response:** The amplitude of the sun track directly controls how bright and how far the sun's rays extend, so the sun glows and dims in sync with the music's loudness.
+**Techniques:** Boat position and the sun pulse use `sin()` and `cos()` with elapsed time (`deltaSeconds` accumulated each frame) so animation speed is frame-rate independent. The three expanding sun rings each compute a `progress` value as `(time * speed + ring/3) % 1`, which staggers them evenly and loops continuously. Ring radius uses `lerp(sunRadius, sunRadius * maxScale, progress)` and ring alpha uses `pow(1 - progress, 3)` so rings fade out sharply as they expand. When audio is on, `sunGlowMultiplier` from the audio mechanic drives `maxScale` and the alpha multiplier, making the rings pulse with the music.
 
 ---
 
-### 🌊 Perlin Noise & Randomness (Adinata)
+### Audio Mechanic — Karina
 
-The Perlin Noise mechanic is the foundation of the ocean's organic, ever-shifting appearance.
+The audio mechanic connects two looping ambient tracks to the visual elements of the artwork.
 
-**Eight foreground wave lines** each move independently. Their vertical positions drift continuously within defined ranges using Perlin noise — each wave has its own speed and phase offset so no two waves ever move in sync. The curve shape of each wave is also noise-driven: every point along the line samples a 2D noise field based on its horizontal position and the current time, producing the characteristic rolling, undulating silhouette of ocean waves.
+**Toggling audio:** A music button in the top-left corner starts and stops playback.
 
-**Wave colours** are drawn in layered strokes of deep Prussian blue, cobalt, and sky blue, building up the ukiyo-e woodblock aesthetic through colour accumulation. The fourth wave layer is rendered as a solid filled band beneath its curve line, reinforcing the sense of water mass below the surface.
+**Wave response:** The wave ambient track is analysed with FFT each frame. Bass energy controls the overall wave height multiplier; each wave layer is additionally modulated by its own frequency band (upper waves = bass, mid waves = mid, lower waves = treble).
 
-**Motion trails:** Each wave records its recent history of positions. Older states are redrawn with progressively lower opacity, creating a natural motion blur trail that echoes the wave's recent path — giving the ocean a sense of continuous flow rather than frame-by-frame jumping.
+**Sun response:** The sun ambient track's amplitude drives `sunGlowMultiplier`, which controls the brightness and reach of the sun rays and the expansion size of the time-driven sun rings.
 
-**Sun rays** are drawn with Perlin noise controlling the length and brightness of each individual ray, so the sun flickers and pulses organically rather than being a static burst of uniform lines.
+**Techniques:** `p5.FFT` analyses the wave track each frame using `waveFFT.analyze()` and `waveFFT.getEnergy("bass" / "mid" / "treble")` to extract per-band energy values (0–255). These are mapped with `map()` into multiplier ranges (e.g. `waveHeightMultiplier` 0.9–1.25) that scale the wave amplitude drawn in the Perlin mechanic. `p5.Amplitude` measures the sun track's overall level via `sunAmp.getLevel()`, mapped to `sunGlowMultiplier` (0.7–3.0). Two sounds are loaded with `loadSound()` in `setup()` and played with `.loop()`. The browser AudioContext is explicitly resumed via `userStartAudio()` and `context.resume()` on first interaction to satisfy browser autoplay policies.
 
 ---
 
-## Part 3: How the Mechanics Come Together
+### Perlin Noise & Randomness — Adinata
 
-![Live preview of the generative artwork](images/sketch-preview.png)
+The Perlin noise mechanic is the foundation of the ocean's organic, ever-shifting appearance.
 
-Each mechanic operates on a different layer of the artwork and they combine without conflict. Perlin noise defines the fundamental shape and position of every wave — this is the baseline that all other mechanics build on top of. Time keeps the scene continuously alive: boats bob, the sun pulses, and the background shifts even when the viewer does nothing. Audio layers a reactive dimension on top — when music plays, the waves breathe in sync with the beat and the sun glows with the music's warmth. User input adds direct agency: clicking the ocean summons fish from beneath the surface, and pressing the spacebar surges the waves like a sudden swell. Together they create a single coherent scene — Hokusai's frozen wave, now fluid, musical, and alive.
+**Eight foreground wave lines** drift vertically within individually defined ranges using Perlin noise, each with its own speed and phase offset so no two waves ever move in sync. Wave curve shapes are also noise-driven, sampling a 2D noise field per vertex. Wave colours are built from layered strokes of prussian blue, cobalt, and sky blue. The fourth wave layer renders as a solid filled band below its curve. **Sun rays** use Perlin noise per ray to control length and brightness, creating an organic flicker effect.
+
+**Techniques:** Wave vertical position is driven by `noise(waveIndex, time * speed)` mapped through `constrain(map(..., 0.25, 0.75, rangeMin, rangeMax))` so each wave oscillates within a defined positional band. Wave curve shapes use `beginShape()` / `curveVertex()` sampling `noise(x * frequency, time + timeOffset)` per vertex to produce smooth, continuously changing silhouettes. Motion trails work by appending the current wave offset to a `history[]` array each frame and replaying older states at progressively lower opacity — no secondary canvas needed. Sun rays iterate around 360° sampling `noise(angle, time)` per ray to vary length and `noise(angle + 100, time)` to vary brightness, giving the sun an organic, flickering glow.
+
+---
+
+## AI Acknowledgement
+
+This project used **Claude Code (claude-sonnet-4-6 by Anthropic)** as an AI coding assistant throughout development. Claude was used to:
+
+- Generate and refine code for all four mechanic files (`perlin-mechanic.js`, `time-mechanic.js`, `audio_mechanic.js`, `userinput-mechanic.js`) and the main orchestration in `sketch.js`
+- Resolve merge conflicts between branches (particularly the audio branch merge that affected wave position logic)
+- Debug coordinate system issues (canvas scaling, design-space transforms, fish jump direction logic)
+- Integrate mechanics without introducing duplicate p5.js lifecycle functions (`preload`, `setup`, `draw`, `mousePressed`)
+- Write and update this README
+
+The generated code was reviewed, tested, and adjusted iteratively by the team. All final decisions about visual design, parameters, and interaction behaviour were made by the team.
+
+> Note: as per the assignment requirement, code files contain comments noting where AI assistance was used.
+
+---
+
+## External References
+
+- **p5.js library** — [https://p5js.org](https://p5js.org) — All drawing, noise, sound analysis, and animation functions are from the p5.js and p5.sound libraries.
+- **"The Great Wave off Kanagawa"** by Katsushika Hokusai (c. 1831) — the source artwork this project reinterprets. Public domain via Wikimedia Commons.
+- **p5.js FFT reference** — [https://p5js.org/reference/p5.sound/p5.FFT/](https://p5js.org/reference/p5.sound/p5.FFT/) — used to understand `getEnergy()` frequency band analysis for the audio mechanic.
+- **p5.js Amplitude reference** — [https://p5js.org/reference/p5.sound/p5.Amplitude/](https://p5js.org/reference/p5.sound/p5.Amplitude/) — used for the sun amplitude → glow multiplier calculation.
+
+---
+
+## Interaction Instructions
+
+1. **Open `index.html`** in a browser (Chrome or Firefox recommended). The artwork begins animating immediately — no interaction required to see the waves, boats, and sun.
+
+2. **Toggle audio** — click the music button in the **top-left corner** of the canvas. The button dims when audio is off and brightens when playing. With audio on, the waves surge and pulse with the beat and the sun glows in response to the music's loudness.
+
+3. **Summon fish** — click anywhere in the **lower ocean area** of the canvas (roughly the bottom half). Four fish will leap from the water at random positions, each jumping forward in the direction it faces, then splashing back down.
+
+4. **Surge the waves** — press the **spacebar** at any time to cause all wave lines to swell taller. The surge decays naturally over about two seconds.
+
+There is no wrong way to interact — try clicking repeatedly, holding spacebar, and toggling the audio on and off to see how the mechanics layer on top of each other.
