@@ -20,7 +20,7 @@ function updateWaveBoost() {
   if (waveBoostTarget < 0.001) waveBoostTarget = 0;
 
   if (waveBoostCurrent > 0.001) {
-    waveHeightMultiplier *= (1 + waveBoostCurrent * 1.0);
+    waveHeightMultiplier *= (1 - waveBoostCurrent * 1.0);
   }
 }
 

@@ -43,7 +43,7 @@ The project is built in p5.js (non-module, classic multi-file) with p5.sound for
 
 **Mouse click — fish jumps:** Clicking anywhere in the lower ocean area causes four fish to leap out of the water at random positions. Each fish follows a parabolic arc (`-sin(PI * progress) * jumpHeight`) with a slight stagger in timing. The fish face random directions and each jump is unique.
 
-**Spacebar — wave surge:** Pressing spacebar triggers a smooth boost to the wave amplitude via a lerp-based decay system. The boost makes the waves shorter, and then decays over ~2 seconds, like a wave that peaks and subsides.
+**Spacebar — wave surge:** Pressing spacebar triggers a smooth boost to the wave amplitude via a lerp-based decay system. Pressing spacebar triggers a smooth boost to the wave amplitude via a lerp-based decay system. The boost rises instantly, makes the waves shorter, and then decays over ~2 seconds, like a wave that peaks and subsides.
 
 **Techniques:** Parabolic arc motion using `sin(PI * progress)`, lerp-based smooth decay for wave boost, coordinate system conversion to map screen clicks into the 1000 × 500 design space, Canvas 2D blend modes for SVG fish rendering.
 
