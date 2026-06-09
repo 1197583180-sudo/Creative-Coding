@@ -20,6 +20,168 @@ const backgroundLines = [
 // Number of previous background-wave states to keep; larger values create longer trails.
 const backgroundTrailLength = 23;
 
+// Time-based 云朵数据。每一朵云都有自己的位置、大小、速度和循环延迟。
+// Time-based cloud data. Each cloud has its own position, size, speed, and loop delay.
+const timeBasedClouds = [
+  { x: 80,   y: 78,  scale: 1.00, speed: 10, alpha: 188, delay: 0.0, wait: 0 },
+  { x: 360,  y: 128, scale: 0.72, speed: 7,  alpha: 148, delay: 1.8, wait: 0 },
+  { x: 640,  y: 88,  scale: 0.86, speed: 13, alpha: 166, delay: 0.9, wait: 0 },
+  { x: 920,  y: 150, scale: 0.58, speed: 8,  alpha: 132, delay: 2.6, wait: 0 },
+];
+
+function setupTimeBasedClouds() {
+  // 根据设计画布宽度把云分散到天空中，避免页面刚开始时所有云都挤在一起。
+  // Spread clouds across the design canvas width so they do not start clustered together.
+  for (let i = 0; i < timeBasedClouds.length; i++) {
+    const cloud = timeBasedClouds[i];
+    cloud.x = (artworkWidth / timeBasedClouds.length) * i + cloud.x * 0.25;
+    cloud.wait = cloud.delay;
+    cloud.texture = createTimeBasedCloudTexture(i);
+    cloud.visualWidth = cloud.texture.width;
+  }
+}
+
+function updateTimeBasedClouds(deltaSeconds) {
+  for (const cloud of timeBasedClouds) {
+    // wait 是纯时间事件：云重置到左侧后会等待一小段时间再重新进入画面。
+    // wait is a pure time event: after a cloud resets to the left, it waits briefly before re-entering.
+    if (cloud.wait > 0) {
+      cloud.wait = max(0, cloud.wait - deltaSeconds);
+      continue;
+    }
+
+    // 云朵的位置只由 deltaSeconds 和自己的 speed 推进，属于 time-based mechanic。
+    // Cloud position advances only through deltaSeconds and its own speed, making it a time-based mechanic.
+    cloud.x += cloud.speed * deltaSeconds;
+
+    // 云完全离开右侧后，从左侧重新进入，并启动下一轮等待。
+    // Once the cloud fully leaves the right side, it re-enters from the left and starts another waiting period.
+    const cloudWidth = cloud.visualWidth * cloud.scale;
+    if (cloud.x - cloudWidth > artworkWidth) {
+      cloud.x = -cloudWidth;
+      cloud.wait = cloud.delay;
+    }
+  }
+}
+
+function drawCloudTextureLayer(buffer, lobes, offsetY, fillColor, blurAmount) {
+  // 这个函数在离屏画布上叠加一层柔边云体。
+  // This function adds one soft-edged cloud-body layer onto an off-screen buffer.
+  buffer.drawingContext.filter = `blur(${blurAmount}px)`;
+  buffer.noStroke();
+  buffer.fill(fillColor);
+
+  for (const lobe of lobes) {
+    buffer.ellipse(lobe.x, lobe.y + offsetY, lobe.w, lobe.h);
+  }
+
+  buffer.drawingContext.filter = 'none';
+}
+
+function createTimeBasedCloudTexture(variantIndex) {
+  // 使用 p5.Graphics 预渲染云朵，让每朵云成为完整纹理，而不是每帧临时叠几个 ellipse。
+  // Use p5.Graphics to pre-render each cloud as a complete texture instead of stacking a few ellipses every frame.
+  const buffer = createGraphics(260, 130);
+  buffer.pixelDensity(1);
+  buffer.clear();
+
+  // 每个 variant 都是手工设定的确定性形状，不使用 random 或 Perlin noise，保持 time-based mechanic 边界清晰。
+  // Each variant is a hand-authored deterministic shape, using no random or Perlin noise, keeping the time-based boundary clear.
+  const cloudVariants = [
+    [
+      { x: 42,  y: 76, w: 78,  h: 30 },
+      { x: 80,  y: 58, w: 92,  h: 48 },
+      { x: 126, y: 47, w: 94,  h: 62 },
+      { x: 178, y: 62, w: 96,  h: 44 },
+      { x: 218, y: 78, w: 70,  h: 28 },
+      { x: 132, y: 82, w: 188, h: 34 },
+    ],
+    [
+      { x: 46,  y: 78, w: 70,  h: 28 },
+      { x: 88,  y: 60, w: 76,  h: 44 },
+      { x: 134, y: 54, w: 118, h: 54 },
+      { x: 184, y: 68, w: 86,  h: 38 },
+      { x: 132, y: 84, w: 176, h: 28 },
+    ],
+    [
+      { x: 38,  y: 80, w: 64,  h: 26 },
+      { x: 74,  y: 65, w: 92,  h: 42 },
+      { x: 122, y: 50, w: 82,  h: 58 },
+      { x: 164, y: 55, w: 94,  h: 50 },
+      { x: 214, y: 76, w: 76,  h: 30 },
+      { x: 132, y: 84, w: 192, h: 30 },
+    ],
+    [
+      { x: 54,  y: 78, w: 80,  h: 28 },
+      { x: 96,  y: 62, w: 84,  h: 46 },
+      { x: 146, y: 58, w: 104, h: 52 },
+      { x: 196, y: 74, w: 74,  h: 32 },
+      { x: 136, y: 84, w: 168, h: 26 },
+    ],
+  ];
+
+  const lobes = cloudVariants[variantIndex % cloudVariants.length];
+
+  // 先画大范围暖色阴影，形成云底厚度。
+  // First draw a broad warm shadow to create thickness under the cloud.
+  drawCloudTextureLayer(buffer, lobes, 12, buffer.color(210, 196, 172, 42), 11);
+
+  // 再画柔和主体，模糊边缘会把独立圆形融合成一个整体云团。
+  // Then draw the soft main body; blurred edges merge individual lobes into one coherent cloud mass.
+  drawCloudTextureLayer(buffer, lobes, 0, buffer.color(255, 249, 232, 96), 8);
+
+  // 中层提高不透明度，给云朵增加体积和实体感。
+  // The middle layer increases opacity, giving the cloud more body and presence.
+  drawCloudTextureLayer(buffer, lobes, 0, buffer.color(255, 252, 240, 128), 4);
+
+  // 顶部高光只覆盖上移后的云体，让云朵有受光面。
+  // Top highlights cover a slightly raised cloud body, creating a lit upper surface.
+  drawCloudTextureLayer(buffer, lobes, -7, buffer.color(255, 255, 250, 76), 5);
+
+  // 底部细长阴影统一整朵云的基底，避免看起来像分散小圆。
+  // A long lower shadow unifies the cloud base, preventing it from looking like separate circles.
+  buffer.drawingContext.filter = 'blur(7px)';
+  buffer.noStroke();
+  buffer.fill(198, 184, 164, 36);
+  buffer.ellipse(134, 92, 170, 20);
+  buffer.drawingContext.filter = 'none';
+
+  return buffer;
+}
+
+function drawSingleTimeBasedCloud(cloud) {
+  push();
+  translate(cloud.x, cloud.y);
+  scale(cloud.scale);
+
+  // 绘制预渲染纹理。tint 只控制整朵云透明度，不改变它内部的高光和阴影层次。
+  // Draw the pre-rendered texture. tint controls only the whole cloud opacity without flattening its internal highlights and shadows.
+  imageMode(CENTER);
+  tint(255, cloud.alpha);
+  image(cloud.texture, 0, 0);
+  noTint();
+
+  pop();
+}
+
+function drawTimeBasedClouds() {
+  // 云朵使用设计坐标系绘制，和海浪/船一样会随窗口等比例缩放。
+  // Clouds are drawn in the design coordinate system, so they scale with the window like waves and boats.
+  const artworkScale = max(width / artworkWidth, height / artworkHeight);
+  const artworkOffsetX = (width - artworkWidth * artworkScale) / 2;
+  const artworkOffsetY = (height - artworkHeight * artworkScale) / 2;
+
+  push();
+  translate(artworkOffsetX, artworkOffsetY);
+  scale(artworkScale);
+
+  for (const cloud of timeBasedClouds) {
+    drawSingleTimeBasedCloud(cloud);
+  }
+
+  pop();
+}
+
 function updateMechanicTime() {
   // deltaTime 是 p5 提供的上一帧到当前帧的毫秒数。
   // deltaTime is provided by p5 and stores the milliseconds elapsed since the previous frame.

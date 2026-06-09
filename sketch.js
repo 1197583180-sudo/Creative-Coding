@@ -8,6 +8,7 @@ function setup() {
   // p5 automatically calls setup after the page loads. This sets up the canvas base, then prepares each mechanic's data.
   setupArtworkBase();
   setupWaveColors();
+  setupTimeBasedClouds();
   setupAudioMechanic();
 }
 
@@ -25,8 +26,13 @@ function draw() {
   // 更新时间，并把同一份时间传给 time-based 和 Perlin mechanic。
   // Update time, then pass the same timing values to the time-based and Perlin mechanics.
   const deltaSeconds = updateMechanicTime();
+  updateTimeBasedClouds(deltaSeconds);
   updatePerlinWaveLines(noiseTime);
   updateTimeDrivenBackgroundLines(deltaSeconds, noiseTime);
+
+  // 云朵画在背景渐变之后、山和太阳之前，让它们停留在天空层。
+  // Clouds are drawn after the background gradient and before the mountain/sun, keeping them in the sky layer.
+  drawTimeBasedClouds();
 
   // 山和太阳先画，后面的海浪会盖在它们前面，形成远近层次。
   // Draw the mountain and sun first, so later waves appear in front and create depth.
