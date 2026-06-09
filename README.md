@@ -15,7 +15,7 @@ Our project reinterprets **"The Great Wave off Kanagawa"** (*神奈川沖浪裏*
 
 ### Vision
 
-We reinterpret *The Great Wave off Kanagawa* by transforming its frozen moment of tension into a living, reactive artwork built in p5.js. Hokusai captured a single frame of the ocean at its most violent — we animate what came before and after that instant. Perlin noise drives the organic swell and roll of water across the canvas, sculpting wave forms that rise and fall like the sea itself; audio amplifies the surge, making the pixel-sorted foam and spray pulse with sound; time governs the tidal rhythm, cycling the image between calm surface and crashing peak; and user input gives the viewer agency to direct the current, steering the distortion like wind across water. Together, these four mechanics transform a still woodblock print into something fluid, turbulent, and ever-shifting — a wave that never quite breaks the same way twice.
+We reinterpret *The Great Wave off Kanagawa* by transforming its frozen moment of tension into a living, reactive artwork built in p5.js. Hokusai captured a single frame of the ocean at its most violent — we animate what came before and after that instant. Perlin noise drives the organic swell and roll of water across the canvas, sculpting wave forms that rise and fall like the sea itself; audio amplifies the surge, making the waves and sun pulse with sound; time governs the continuous rhythm of the ocean, keeping boats afloat and the sun alive even in silence; and user input gives the viewer agency to disturb the scene — summoning fish from the deep and surging the waves with a keystroke. Together, these four mechanics transform a still woodblock print into something fluid, musical, cyclical, and responsive — a wave that never quite breaks the same way twice.
 
 ---
 
@@ -23,37 +23,51 @@ We reinterpret *The Great Wave off Kanagawa* by transforming its frozen moment o
 
 ### 🖱️ User Input (Joy)
 
-The User Input mechanic serves as the primary controller for the real-time pixel sorting process, turning a static image into a responsive digital environment. The core interaction is mapped to the horizontal movement of the mouse. By moving the mouse along the x-axis, the user adjusts the brightness threshold of the sorting algorithm. Moving the mouse to the left lowers this threshold, allowing more pixels to break free and flow downward in long streaks. Moving it to the right increases the threshold, which stops the movement and stabilizes the image.
+The User Input mechanic gives the viewer two ways to directly disturb the scene.
 
-Beyond horizontal movement, the vertical y-axis of the mouse controls the length and intensity of these streaks, letting the user stretch the textures into deep, volcanic-like patterns. For further customization, pressing the C key on the keyboard cycles through different color gradients, shifting the visual mood from warm oranges to cool blues. This interactivity directly fulfills our project vision of creating a living artwork. Instead of watching a pre-recorded animation, the viewer actively shapes the geological flow, ensuring that the landscape is constantly shifting and never repeats itself.
+**Mouse click — fish jumps:** Clicking anywhere in the lower ocean area of the canvas (the wave region) causes four fish to leap out of the water at random positions scattered across the ocean. Each fish follows a parabolic arc — rising from the surface and falling back in — with a slight stagger in timing between each one so the jumps feel natural rather than mechanical. The fish face random directions and appear at random horizontal and vertical positions within the ocean, so every click produces a different result.
+
+**Spacebar — wave surge:** Pressing the spacebar triggers an immediate boost to the wave amplitude, making all eight foreground wave lines surge visibly taller. The boost then decays smoothly back to its resting state over roughly two seconds, like a wave that peaks and subsides. This gives the viewer a sense of physical force over the ocean.
 
 ---
 
 ### ⏱️ Time-Based Mechanic (Lihang)
 
-For the time-based mechanic, I plan to use timers and gradual events to make the artwork feel like it is constantly breathing and transforming, even when the user is not directly interacting with it. The piece will move through slow visual cycles, where the pixel-sorted texture shifts between calm, unstable, and intense states. For example, every few seconds the sorting strength can increase, causing the vertical colour streaks to stretch downward like melting lava or digital rain. After reaching a peak, the distortion will slowly fade back into a quieter state before the next cycle begins.
+The Time-Based mechanic keeps the artwork in constant motion without requiring any interaction from the viewer.
 
-This mechanic connects to our vision of turning a static pixel-sorted image into a living digital landscape. Time becomes the force that keeps the artwork alive. Instead of the image staying frozen, it gradually changes like geological movement, volcanic heat, or flowing magma. The user does not need to click or drag to experience this mechanic; they can simply watch the artwork evolve over time. This creates a sense of rhythm and anticipation, making the piece feel unstable, organic, and continuously in motion.
+**Two boats** float across the canvas, one small and distant in the background, one large in the foreground. Each bobs up and down and drifts slightly left and right following smooth sinusoidal paths driven by elapsed time. They are layered between different wave lines — the smaller boat sits behind all the foreground waves, while the larger boat weaves between the third and fourth wave layers, giving the scene genuine depth.
+
+**The sun** pulses gently in size over time and radiates three expanding light rings that fade as they grow outward, creating a continuous breathing effect that makes the sky feel alive.
+
+**The background wave band** drifts slowly up and down between a narrow range, leaving a faint motion trail that adds subtle atmospheric depth behind the foreground waves.
+
+All of this runs continuously from the moment the page loads, requiring no interaction.
 
 ---
 
 ### 🎵 Audio Mechanic (Karina)
 
-The system analyses incoming audio and measures its amplitude (overall loudness) and frequency content. These values combine with the user’s mouse movement to control the pixel-sorting effect. When the user drags the mouse across the screen, the selected area becomes active and begins to respond to the surrounding sound — much like how the surface of water responds to vibration.
+The Audio mechanic connects two looping sound tracks to the visual elements of the artwork, so the scene responds to music in real time.
 
-When the audio is quiet, the pixels shift gently and the wave holds near its composed Hokusai form. As the sound grows louder, the dragged area surges and displaces horizontally, simulating the chaotic froth and spray at the crest of the wave. Low frequencies (bass) move larger masses of pixels, echoing the deep roll of the ocean’s body, while high frequencies generate finer, frothing detail at the edges — the white foam Hokusai rendered as delicate claws. This makes the image pulse in sync with both gesture and sound.
+**Starting audio:** A music button in the top-left corner of the canvas toggles playback — click once to start, click again to stop.
 
-The mechanic connects directly to our vision: the artwork only surges after the user engages it, turning Hokusai’s static composition into a dynamic seascape shaped collaboratively by movement and audio.
+**Wave response:** Two audio tracks play simultaneously — a wave ambient track and a sun ambient track. The wave track is analysed each frame using an FFT (frequency analyser). Bass frequencies control the overall wave height multiplier, making all waves surge taller when low-end energy is high. Each individual wave layer is additionally modulated by its own frequency band — upper waves react to bass, middle waves to mid frequencies, and lower waves to treble — so different parts of the ocean pulse at different rates depending on what the music is doing.
+
+**Sun response:** The amplitude of the sun track directly controls how bright and how far the sun's rays extend, so the sun glows and dims in sync with the music's loudness.
 
 ---
 
 ### 🌊 Perlin Noise & Randomness (Adinata)
 
-For my mechanic, I plan to use Perlin noise to create a sense of organic, undulating movement across the canvas — much like how ocean water swells, rolls, and churns naturally. Perlin noise generates smooth, continuous random values that are ideal for simulating the fluid, ever-shifting surface of the sea that Hokusai captured at its most extreme.
+The Perlin Noise mechanic is the foundation of the ocean's organic, ever-shifting appearance.
 
-My idea is to use Perlin noise to control how the pixel-sorting effect flows across the canvas: some regions will feel like the deep, dark body of water beneath the wave, with subtle slow-drifting distortion; others will simulate the violent turbulence at the crest, with rapid, chaotic pixel movement. The colour gradients will also be noise-driven — shifting between the deep Prussian blue of the ocean, the pale grey-green of the wave's underside, and the white of the breaking foam, so the tones drift organically rather than in hard bands.
+**Eight foreground wave lines** each move independently. Their vertical positions drift continuously within defined ranges using Perlin noise — each wave has its own speed and phase offset so no two waves ever move in sync. The curve shape of each wave is also noise-driven: every point along the line samples a 2D noise field based on its horizontal position and the current time, producing the characteristic rolling, undulating silhouette of ocean waves.
 
-I will also incorporate a random seed so that the piece can reproduce the same starting state, while still feeling unpredictable as it flows. The user experiences this mechanic by simply watching. The artwork rewards patience, as it never quite repeats itself.
+**Wave colours** are drawn in layered strokes of deep Prussian blue, cobalt, and sky blue, building up the ukiyo-e woodblock aesthetic through colour accumulation. The fourth wave layer is rendered as a solid filled band beneath its curve line, reinforcing the sense of water mass below the surface.
+
+**Motion trails:** Each wave records its recent history of positions. Older states are redrawn with progressively lower opacity, creating a natural motion blur trail that echoes the wave's recent path — giving the ocean a sense of continuous flow rather than frame-by-frame jumping.
+
+**Sun rays** are drawn with Perlin noise controlling the length and brightness of each individual ray, so the sun flickers and pulses organically rather than being a static burst of uniform lines.
 
 ---
 
@@ -61,4 +75,4 @@ I will also incorporate a random seed so that the piece can reproduce the same s
 
 ![Live preview of the generative artwork](images/sketch-preview.png)
 
-Each mechanic operates on a different axis of the artwork. Perlin noise defines the spatial seascape — sculpting which regions surge with turbulence and which hold in deep calm. Audio reshapes that seascape in real time, amplifying the wave wherever sound crests. Time drives the slow tidal cycle, building the wave from stillness to its peak and letting it recede, ensuring the piece never fully settles even in silence. User input layers personal agency on top, letting the viewer direct the current and steer the distortion like wind across the surface. Together they create a single coherent experience: Hokusai's frozen wave, now fluid, musical, cyclical, and responsive — a sea that never breaks the same way twice.
+Each mechanic operates on a different layer of the artwork and they combine without conflict. Perlin noise defines the fundamental shape and position of every wave — this is the baseline that all other mechanics build on top of. Time keeps the scene continuously alive: boats bob, the sun pulses, and the background shifts even when the viewer does nothing. Audio layers a reactive dimension on top — when music plays, the waves breathe in sync with the beat and the sun glows with the music's warmth. User input adds direct agency: clicking the ocean summons fish from beneath the surface, and pressing the spacebar surges the waves like a sudden swell. Together they create a single coherent scene — Hokusai's frozen wave, now fluid, musical, and alive.

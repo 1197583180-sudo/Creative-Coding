@@ -16,11 +16,45 @@ let bassEnergy = 0;
 let midEnergy = 0;
 let trebleEnergy = 0;
 
+let audioButtonImg;
+let audioPlaying = false;
+
+const AUDIO_BTN_X    = 20;
+const AUDIO_BTN_Y    = 20;
+const AUDIO_BTN_SIZE = 70;
+
 // -----------------------------------------------------
 
 function preloadAudio() {
-
   soundFormats('mp3');
+  audioButtonImg = loadImage('images/blue_music_button.png');
+}
+
+// -----------------------------------------------------
+
+function drawAudioButton() {
+  if (!audioButtonImg) return;
+  push();
+  tint(255, audioPlaying ? 255 : 160);
+  image(audioButtonImg, AUDIO_BTN_X, AUDIO_BTN_Y, AUDIO_BTN_SIZE, AUDIO_BTN_SIZE);
+  noTint();
+  pop();
+}
+
+function isAudioButtonClick(mx, my) {
+  return mx >= AUDIO_BTN_X && mx <= AUDIO_BTN_X + AUDIO_BTN_SIZE &&
+         my >= AUDIO_BTN_Y && my <= AUDIO_BTN_Y + AUDIO_BTN_SIZE;
+}
+
+function toggleAudioMechanic() {
+  if (audioPlaying) {
+    if (sunSound)  sunSound.stop();
+    if (waveSound) waveSound.stop();
+    audioPlaying = false;
+  } else {
+    startAudioMechanic();
+    audioPlaying = true;
+  }
 }
 
 // -----------------------------------------------------

@@ -1,21 +1,21 @@
 // Interaction mechanic: spacebar intensifies waves; mouse click triggers fish jumps.
 
 // --- Spacebar: wave intensity ---
-// waveBoost is extra amplitude added on top of waveAmplitude; it decays each frame.
-let waveBoost = 0;
+// userInputWaveBoost is extra amplitude added on top of baseWaveAmplitude; it decays each frame.
+let userInputWaveBoost = 0;
 
 function keyPressed() {
-  if (key === ' ') waveBoost = 200;
+  if (key === ' ') userInputWaveBoost = 200;
 }
 
 // Call each frame: decay boost toward 0.
 function updateWaveBoost() {
-  waveBoost *= 0.93;
+  userInputWaveBoost *= 0.93;
 }
 
 // Used by perlin-mechanic.js: returns the current total amplitude.
 function getTotalWaveAmplitude() {
-  return waveAmplitude + waveBoost;
+  return baseWaveAmplitude + userInputWaveBoost;
 }
 
 // --- Mouse click: fish jumps ---
@@ -29,26 +29,31 @@ function preloadFish() {
 }
 
 function mousePressed() {
+  // If the audio button was clicked, toggle audio and skip everything else.
+  if (isAudioButtonClick(mouseX, mouseY)) {
+    toggleAudioMechanic();
+    return;
+  }
+
   // Convert screen click coordinates into the 1000×500 design coordinate system used in sketch.js.
   const artworkScale = max(width / artworkWidth, height / artworkHeight);
-  const artworkOffsetX = (width - artworkWidth * artworkScale) / 2;
   const artworkOffsetY = (height - artworkHeight * artworkScale) / 2;
 
-  const designX = (mouseX - artworkOffsetX) / artworkScale;
   const designY = (mouseY - artworkOffsetY) / artworkScale + 40; // +40 compensates for the translate(0,-40) in sketch.js
 
-  // Create a jump instance for each of the four fish, slightly staggered horizontally.
-  const offsets = [-90, -30, 30, 90];
-  offsets.forEach((dx, i) => {
-    fishJumps.push({
-      img: fishImages[i],
-      x: designX + dx,
-      waterY: designY,   // Water surface baseline in design coordinates.
-      t: 0,              // Animation progress 0 to 1.
-      delay: i * 0.08,   // Stagger each fish slightly for a natural feel.
-      flipX: dx < 0,     // Fish on the left face left.
-    });
-  });
+  // Only spawn fish when the click lands in the ocean area (y 340–500 in design coordinates).
+  if (designY >= 340 && designY <= 500) {
+    for (let i = 0; i < fishImages.length; i++) {
+      fishJumps.push({
+        img: fishImages[i],
+        x: random(0, artworkWidth),   // Random x anywhere across the canvas.
+        waterY: random(340, 500),     // Random y within the ocean area.
+        t: 0,
+        delay: i * 0.08,              // Staggered timing kept for natural feel.
+        flipX: random() > 0.5,        // Random facing direction.
+      });
+    }
+  }
 }
 
 // Call each frame: update and draw all active fish jumps.

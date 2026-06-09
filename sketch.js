@@ -1,5 +1,6 @@
 function preload() {
   preloadAudio();
+  preloadFish();
 }
 
 function setup() {
@@ -18,6 +19,7 @@ function draw() {
   // Redraw the background first each frame to prevent previous-frame artifacts.
 
   updateAudioMechanic();
+  updateWaveBoost();
   drawBackgroundGradient();
 
   // 更新时间，并把同一份时间传给 time-based 和 Perlin mechanic。
@@ -89,9 +91,13 @@ function draw() {
   // Draw the remaining waves last, so they cover the front of the large boat and create occlusion depth.
   for (let i = 3; i < waveLines.length; i++) drawWaveLine(waveLines[i]);
 
-  pop();
-}
+  // 更新并绘制所有活跃的鱼跳跃动画，画在最前面让鱼出现在波浪上方。
+  // Update and draw all active fish jump animations on top of everything else.
+  updateAndDrawFish(deltaSeconds);
 
-function mousePressed() {
-  startAudioMechanic();
+  pop();
+
+  // 音频按钮始终显示在画布左上角，独立于作品坐标系。
+  // Audio button is drawn at screen coordinates, independent of the artwork transform.
+  drawAudioButton();
 }
