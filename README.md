@@ -2,12 +2,13 @@
 
 **University of Sydney** | IDEA9103 Creative Coding
 **Team:** Joy (Siying Song), Lihang Shi, Karina Zhu, Adinata Harlan
+**Repository:** https://github.com/1197583180-sudo/Creative-Coding.git
 
 ---
 
 ## Inspiration
 
-Our project reinterprets **"The Great Wave off Kanagawa"** (*神奈川沖浪裏*) by **Katsushika Hokusai** (c. 1831), one of the most iconic woodblock prints in the world. The composition captures a towering, claw-like wave at the moment of its peak — frothy white foam breaking into chaos, deep indigo water coiling with tremendous force, and the serene silhouette of Mount Fuji standing small in the background. Its power lies in contrast: explosive motion against absolute stillness, organic chaos against geometric calm.
+Our project reinterprets **"The Great Wave off Kanagawa"** by **Katsushika Hokusai** (c. 1831), one of the most iconic woodblock prints in the world. The composition captures a towering, claw-like wave at the moment of its peak — frothy white foam breaking into chaos, deep indigo water coiling with tremendous force, and the serene silhouette of Mount Fuji standing small in the background. Its power lies in contrast: explosive motion against absolute stillness, organic chaos against geometric calm.
 
 ![The Great Wave off Kanagawa by Katsushika Hokusai](images/wave-1.jpg)
 
