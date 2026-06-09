@@ -1,3 +1,8 @@
+// Time-based mechanic: boats, birds, sun rings, clouds, and background wave, all driven by elapsed time.
+// AI-assisted: this file was developed with the help of Claude Code (claude-sonnet-4-6, Anthropic).
+// AI assistance was used for the boat drawing system, tapered wing stroke technique, bird flock animation,
+// cloud rendering, and sun ring expansion tied to audio.
+
 // 全局时间变量：所有 time-based 动画都会读取或间接受它影响。
 // Global time variable: all time-based animations read from it or are indirectly driven by it.
 let noiseTime = 0;
@@ -200,6 +205,10 @@ function drawSingleTimeBasedCloud(cloud) {
   pop();
 }
 
+// Tapered stroke technique: samples a Bézier curve using bezierPoint() at small intervals,
+// then draws each segment with a strokeWeight modulated by sin(PI * t) — thin at both ends,
+// thicker in the middle — to mimic the calligraphic quality of ukiyo-e ink brushwork.
+// Uses p5.js bezierPoint() reference: https://p5js.org/reference/p5/bezierPoint/
 function drawTaperedWingStroke(x1, y1, cx1, cy1, cx2, cy2, x2, y2, alpha, baseWeight = 2.2) {
   // 用分段线模拟笔触粗细变化：两端细，中段略粗，更接近参考图中的手绘海鸥线条。
   // Simulate changing brush thickness with segmented lines: thin ends and a thicker middle, closer to the hand-drawn gull strokes in the reference.

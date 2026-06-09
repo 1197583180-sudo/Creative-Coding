@@ -1,4 +1,6 @@
 // Interaction mechanic: spacebar intensifies waves; mouse click triggers fish jumps.
+// AI-assisted: this file was developed with the help of Claude Code (claude-sonnet-4-6, Anthropic).
+// AI assistance was used for the parabolic fish arc, lerp-based wave boost decay, and SVG blend mode rendering.
 
 // --- Spacebar: wave intensity ---
 // userInputWaveBoost is extra amplitude added on top of baseWaveAmplitude; it decays each frame.
@@ -135,7 +137,11 @@ function updateAndDrawFish(deltaSeconds) {
     noStroke();
     fill(255, 255, 255, alpha);
     ellipse(0, 0, fishW * 0.15, fishH * 0.15);
-    // multiply blend mode removes white background; white areas pick up the golden halo colour.
+    // drawingContext.globalCompositeOperation is a Canvas 2D API property (not standard p5.js).
+    // 'multiply' blends pixel colours by multiplying them: white (255) × any colour = that colour,
+    // so the SVG's white background disappears and only the fish linework remains.
+    // Source: MDN Web Docs — CanvasRenderingContext2D: globalCompositeOperation property
+    // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
     drawingContext.globalCompositeOperation = 'multiply';
     tint(255, alpha);
     image(f.img, -fishW / 2, -fishH / 2, fishW, fishH);
