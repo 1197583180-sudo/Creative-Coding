@@ -45,7 +45,7 @@ The project is built in p5.js (non-module, classic multi-file) with p5.sound for
 
 **Mouse click — fish jumps:** Clicking anywhere in the lower ocean area causes four fish to leap out of the water at random positions. Each fish follows a parabolic arc (`-sin(PI * progress) * jumpHeight`) with a slight stagger in timing. The fish face random directions and each jump is unique.
 
-**Spacebar — wave surge:** Pressing spacebar triggers a smooth boost to the wave amplitude via a lerp-based decay system. The boost rises instantly and decays over ~2 seconds, like a wave that peaks and subsides.
+**Spacebar — wave surge:** Pressing spacebar triggers a smooth boost to the wave amplitude via a lerp-based decay system. Pressing spacebar triggers a smooth boost to the wave amplitude via a lerp-based decay system. The boost rises instantly, makes the waves shorter, and then decays over ~2 seconds, like a wave that peaks and subsides.
 
 **Techniques:** Parabolic arc motion using `sin(PI * progress)`, lerp-based smooth decay for wave boost, coordinate system conversion to map screen clicks into the 1000 × 500 design space, Canvas 2D blend modes for SVG fish rendering.
 
@@ -55,13 +55,15 @@ The project is built in p5.js (non-module, classic multi-file) with p5.sound for
 
 **What it does:** Keeps the artwork in constant motion without any viewer interaction.
 
-**Two boats** float across the canvas — one small and distant, one large in the foreground — each bobbing and drifting on sinusoidal paths driven by elapsed time. They are layered between wave lines to create depth. Passengers on each boat have animated rowing arms that swing from a body-end pivot. A flock of seven birds scrolls continuously from right to left across the sky, each with independent Perlin-noise-driven vertical drift.
+**Two boats** float across the canvas — one small and distant, one large in the foreground — each bobbing and drifting on sinusoidal paths driven by elapsed time. They are layered between wave lines to create depth. Passengers on each boat are drawn as part of the boat and inherit the same boat transform, so they move and rotate with it.
+
+**Clouds and seagulls** animate in the sky using time only. Soft pre-rendered cloud textures drift slowly from left to right, reset after leaving the canvas, and wait briefly before re-entering. A fixed formation of seven distant line-drawn seagulls scrolls from right to left across the sky; their wing motion is driven by a timer and preset phase offsets rather than random, audio, mouse, keyboard, or Perlin noise.
 
 **The sun** pulses in size and radiates three expanding light rings that fade as they grow. When audio is active, `sunGlowMultiplier` (from `audio_mechanic.js`) causes the rings to expand further and glow brighter in sync with the music.
 
 **The background wave** drifts slowly with a motion trail, adding atmospheric depth.
 
-**Techniques:** Sinusoidal (`sin()`) boat bobbing, `lerp()` for flock flight path, `noise()` for individual bird drift, `bezierPoint()` for tapered wing strokes, `deltaTime`-based frame-rate-independent animation, layered `push()`/`pop()`/`scale()` for coordinate transforms.
+**Techniques:** Sinusoidal (`sin()`) boat bobbing, timer-driven cloud and seagull movement, preset seagull formation data, `bezierPoint()` for tapered wing strokes, `deltaTime`-based frame-rate-independent animation, layered `push()`/`pop()`/`scale()` for coordinate transforms.
 
 ---
 
@@ -108,6 +110,8 @@ The project is built in p5.js (non-module, classic multi-file) with p5.sound for
 - Implementing the tapered wing stroke technique using `bezierPoint()`
 - Resolving merge conflicts between team members' branches
 
+**ChatGPT / Codex** (OpenAI) was also used during later development to review the multi-file project structure, explain how mechanic files connect through `sketch.js`, refine the time-based cloud and seagull prompts, debug the spacebar wave interaction, and align this README with the current implementation. In particular, it helped identify that the user-input wave boost must affect the same `waveHeightMultiplier` read by `perlin-mechanic.js`, and it helped rewrite the documentation so the time-based bird system is described as a timer-driven fixed formation rather than a Perlin-noise-driven flock.
+
 All AI-assisted code sections are marked with `// AI-assisted` comments in the respective source files. The generated code was reviewed, tested, and modified by each team member to match their mechanic's requirements.
 
 ---
@@ -138,4 +142,4 @@ Used in `time-mechanic.js` to draw bird wing strokes that vary in thickness from
 
 4. **Summon fish** — click anywhere in the **lower ocean area** of the canvas (roughly the bottom half of the artwork). Four fish will leap out of the water at random positions and fall back in. Each click produces a different result.
 
-5. **Surge the waves** — press the **spacebar** to trigger an immediate wave surge. The waves drop and then recover over roughly 2 seconds.
+5. **Surge the waves** — press the **spacebar** to trigger an immediate wave surge. The waves grow taller and then gradually return to normal over roughly 2 seconds.

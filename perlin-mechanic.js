@@ -1,6 +1,7 @@
 // Perlin noise mechanic: drives all wave shapes, positions, motion trails, and sun ray flicker.
 // AI-assisted: this file was developed with the help of Claude Code (claude-sonnet-4-6, Anthropic).
 // AI assistance was used for the noise-driven wave system, curveVertex sampling loop, and motion trail history replay.
+// AI-assisted: ChatGPT/Codex was also used to check how user-input wave boosts connect with this Perlin wave drawing code.
 
 // 存放整件作品会重复使用的海浪颜色，由 Perlin noise 驱动的浪和背景浪共用。
 // Stores reusable wave colors shared by the Perlin-noise-driven waves and the background wave.
