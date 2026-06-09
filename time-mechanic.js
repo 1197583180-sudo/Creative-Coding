@@ -454,6 +454,64 @@ function drawBoat(x, y, boatWidth) {
     endShape(CLOSE);
   };
 
+  const drawPassengers = () => {
+    // 小人作为船的一部分画在 drawBoat() 内，因此会自动继承船的 translate 和 rotate。
+    // Passengers are drawn inside drawBoat(), so they automatically inherit the boat's translate and rotate.
+    const passengerCount = boatWidth >= 200 ? 4 : 2;
+    const spacing = boatWidth * 0.145;
+    const startX = x - spacing * (passengerCount - 1) / 2;
+    const deckY = tipY - boatHeight * 0.035;
+    const personScale = boatWidth * 0.0085;
+
+    for (let i = 0; i < passengerCount; i++) {
+      const px = startX + spacing * i;
+      const lean = i % 2 === 0 ? -0.20 : 0.12;
+      const robeColor = i % 2 === 0 ? color(38, 42, 54) : color(72, 49, 34);
+
+      push();
+      translate(px, deckY);
+      scale(personScale);
+      rotate(lean);
+
+      // 版画式斗笠：宽而扁的三角形和墨色边线，比圆头小人更像远景船夫。
+      // Woodblock-style straw hat: a wide flat triangle with ink edging reads more like a distant boatman than a cartoon head.
+      stroke(62, 41, 24, 185);
+      strokeWeight(0.75);
+      fill(218, 190, 128);
+      triangle(-6.8, -8.2, 6.8, -8.2, 0, -13.4);
+      line(-5.2, -8.2, 5.2, -8.2);
+
+      // 头部只用帽檐下方的小暗点暗示，避免现代卡通脸。
+      // The head is only implied by a small dark mark under the brim, avoiding a modern cartoon face.
+      noStroke();
+      fill(42, 29, 22);
+      ellipse(0, -6.8, 3.3, 2.8);
+
+      // 弯腰身体使用克制色块和墨色外轮廓，贴合浮世绘远景人物的符号化语言。
+      // The bent body uses restrained color blocks and ink-like contours, matching the symbolic language of distant ukiyo-e figures.
+      stroke(28, 24, 22, 180);
+      strokeWeight(0.8);
+      fill(robeColor);
+      beginShape();
+      vertex(-3.6, -5.0);
+      quadraticVertex(1.4, -3.0, 3.8, 1.2);
+      vertex(1.6, 6.0);
+      vertex(-3.4, 5.4);
+      quadraticVertex(-5.0, 0.0, -3.6, -5.0);
+      endShape(CLOSE);
+
+      // 短手臂和船桨用细墨线表现，细节少但动作明确。
+      // Short arms and oars are drawn with thin ink lines: minimal detail but clear rowing action.
+      stroke(38, 26, 18, 165);
+      strokeWeight(0.75);
+      line(2.2, -1.8, 7.5, 2.8);
+      strokeWeight(0.95);
+      line(6.8, 1.2, 14.2, 8.0);
+
+      pop();
+    }
+  };
+
   // 从深到浅依次覆盖，形成木船的体积感。
   // Paint from darker to lighter overlays to give the wooden boat volume.
   fill(shadeOf(3));
@@ -467,6 +525,8 @@ function drawBoat(x, y, boatWidth) {
 
   fill(shadeOf(0));
   fillAboveBand(bandEdgesAt(1 / 4));
+
+  drawPassengers();
 
   // 最后加描边，明确船的轮廓。
   // Add the final outline to clarify the boat shape.
