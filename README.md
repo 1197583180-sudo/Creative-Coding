@@ -57,7 +57,7 @@ The project is built in p5.js (non-module, classic multi-file) with p5.sound for
 
 **Two boats** float across the canvas — one small and distant, one large in the foreground — each bobbing and drifting on sinusoidal paths driven by elapsed time. They are layered between wave lines to create depth. Passengers on each boat are drawn as part of the boat and inherit the same boat transform, so they move and rotate with it.
 
-**Clouds and seagulls** animate in the sky using time only. Soft pre-rendered cloud textures drift slowly from left to right, reset after leaving the canvas, and wait briefly before re-entering. A fixed formation of seven distant line-drawn seagulls scrolls continuously from right to left across the sky and wraps back to the right edge in an endless loop. Wing flapping is driven by a timer with preset phase offsets so each bird flaps at a slightly different rate. Each bird also has a subtle individual up-and-down drift driven by Perlin noise seeded from its own phase offset, giving the flock a natural, organic feel while keeping the overall formation intact.
+**Clouds and seagulls** animate in the sky using time only. Soft pre-rendered cloud textures drift slowly from left to right, reset after leaving the canvas, and wait briefly before re-entering. A fixed formation of seven distant line-drawn seagulls scrolls from right to left across the sky; their wing motion is driven by a timer and preset phase offsets rather than random, audio, mouse, keyboard, or Perlin noise.
 
 **The sun** pulses in size and radiates three expanding light rings that fade as they grow. When audio is active, `sunGlowMultiplier` (from `audio_mechanic.js`) causes the rings to expand further and glow brighter in sync with the music.
 
@@ -110,7 +110,7 @@ The project is built in p5.js (non-module, classic multi-file) with p5.sound for
 - Implementing the tapered wing stroke technique using `bezierPoint()`
 - Resolving merge conflicts between team members' branches
 
-**ChatGPT / Codex** (OpenAI) was also used during later development to review the multi-file project structure, explain how mechanic files connect through `sketch.js`, refine the time-based cloud and seagull prompts, debug the spacebar wave interaction, and align this README with the current implementation. In particular, it helped identify that the user-input wave boost must affect the same `waveHeightMultiplier` read by `perlin-mechanic.js`, and it helped clarify how the time-based bird system works — a timer-driven fixed formation where each bird also has individual Perlin-noise-based drift for natural movement.
+**ChatGPT / Codex** (OpenAI) was also used during later development to review the multi-file project structure, explain how mechanic files connect through `sketch.js`, refine the time-based cloud and seagull prompts, debug the spacebar wave interaction, and align this README with the current implementation. In particular, it helped identify that the user-input wave boost must affect the same `waveHeightMultiplier` read by `perlin-mechanic.js`, and it helped rewrite the documentation so the time-based bird system is described as a timer-driven fixed formation rather than a Perlin-noise-driven flock.
 
 All AI-assisted code sections are marked with `// AI-assisted` comments in the respective source files. The generated code was reviewed, tested, and modified by each team member to match their mechanic's requirements.
 
