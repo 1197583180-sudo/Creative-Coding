@@ -2,20 +2,23 @@
 
 // --- Spacebar: wave intensity ---
 // userInputWaveBoost is extra amplitude added on top of baseWaveAmplitude; it decays each frame.
-let userInputWaveBoost = 0;
+let waveBoostTarget  = 0;  // set to 1.0 on spacebar, then decays
+let waveBoostCurrent = 0;  // smoothly follows target via lerp
 
 function keyPressed() {
-  if (key === ' ') userInputWaveBoost = 200;
+  if (key === ' ') waveBoostTarget = 1.0;
 }
 
-// Call each frame: decay boost toward 0.
+// Same approach as audio mechanic: multiply waveHeightMultiplier (already set by audio this
+// frame) so perlin reads the boosted value. Lerp gives smooth rise; target decay gives smooth fall.
 function updateWaveBoost() {
-  userInputWaveBoost *= 0.93;
-}
+  waveBoostCurrent = lerp(waveBoostCurrent, waveBoostTarget, 0.12);
+  waveBoostTarget  *= 0.96;
+  if (waveBoostTarget < 0.001) waveBoostTarget = 0;
 
-// Used by perlin-mechanic.js: returns the current total amplitude.
-function getTotalWaveAmplitude() {
-  return baseWaveAmplitude + userInputWaveBoost;
+  if (waveBoostCurrent > 0.001) {
+    waveHeightMultiplier *= (1 - waveBoostCurrent * 1.0);
+  }
 }
 
 // --- Mouse click: fish jumps ---
@@ -47,7 +50,7 @@ function mousePressed() {
   const designY = (mouseY - artworkOffsetY) / artworkScale + 40; // +40 compensates for the translate(0,-40) in sketch.js
 
   // Only spawn fish when the click lands in the ocean area (y 340–500 in design coordinates).
-  if (designY >= 340 && designY <= 500) {
+  if (designY >= 340 && designY <= 600) {
     for (let i = 0; i < fishImages.length; i++) {
       const direction = random() > 0.5 ? 1 : -1;
       // Flip only when direction is opposite to the fish's natural facing in the SVG.
@@ -55,7 +58,7 @@ function mousePressed() {
       fishJumps.push({
         img: fishImages[i],
         x: random(0, artworkWidth),
-        waterY: random(340, 500),
+        waterY: random(340, 600),
         t: 0,
         delay: i * 0.08,
         flipX,

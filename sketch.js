@@ -22,8 +22,6 @@ function draw() {
   updateWaveBoost();
   drawBackgroundGradient();
 
-  // 更新时间，并把同一份时间传给 time-based 和 Perlin mechanic。
-  // Update time, then pass the same timing values to the time-based and Perlin mechanics.
   const deltaSeconds = updateMechanicTime();
   updatePerlinWaveLines(noiseTime);
   updateTimeDrivenBackgroundLines(deltaSeconds, noiseTime);
@@ -65,30 +63,18 @@ function draw() {
     drawBackgroundWaveBand(backgroundLine.baseY + backgroundLine.offset, backgroundLine.timeOffset, 255, backgroundLine.colorKeys, noiseTime);
   }
 
+  // Shift applied to both history and current at the same draw-time value —
   const drawWaveLine = (waveLine) => {
-    // 先按历史记录重画旧状态，透明度从低到高，形成拖影。
-    // First redraw older states from history with increasing alpha to create a trail.
     for (let i = 0; i < waveLine.history.length; i++) {
       const alpha = 255 * i / max(1, waveLine.history.length - 1);
       const historyY = waveLine.baseY + waveLine.history[i].offset;
       drawWaveLineLayers(historyY, waveLine.timeOffset, alpha, waveLine.colorKeys, waveLine.history[i].time);
     }
-
-    // 最后画当前状态，透明度最高，所以当前海浪最清晰。
-    // Finally draw the current state at full opacity, making the current wave the clearest.
     drawWaveLineLayers(waveLine.baseY + waveLine.offset, waveLine.timeOffset, 255, waveLine.colorKeys, noiseTime, waveLine.filled);
   };
 
-  // 先画前三条浪，作为大船后方的海面。
-  // Draw the first three waves first, placing them behind the large boat.
   for (let i = 0; i < 3; i++) drawWaveLine(waveLines[i]);
-
-  // 再画大船，让它位于部分海浪之间。
-  // Draw the large boat next, placing it between wave layers.
   drawTimeDrivenBoat(650, 410, 260, 1, 1.6, 15);
-
-  // 最后画剩下的浪，让它们覆盖在大船前方，制造遮挡层次。
-  // Draw the remaining waves last, so they cover the front of the large boat and create occlusion depth.
   for (let i = 3; i < waveLines.length; i++) drawWaveLine(waveLines[i]);
 
   // 更新并绘制所有活跃的鱼跳跃动画，画在最前面让鱼出现在波浪上方。

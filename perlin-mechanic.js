@@ -172,12 +172,8 @@ else {
     // curveVertex 会生成平滑曲线。开头和结尾额外给点可以让边缘更自然。
     // curveVertex creates a smooth curve. Extra start/end points make the edges behave more naturally.
     curveVertex(-50, layerY);
-    for (const s of samples) curveVertex(s.x, layerY + s.n * baseWaveAmplitude *
-waveHeightMultiplier *
-fftMultiplier);
-    curveVertex(lastSample.x, layerY + lastSample.n * baseWaveAmplitude *
-waveHeightMultiplier *
-fftMultiplier);
+    for (const s of samples) curveVertex(s.x, layerY + s.n * baseWaveAmplitude * waveHeightMultiplier * fftMultiplier);
+    curveVertex(lastSample.x, layerY + lastSample.n * baseWaveAmplitude * waveHeightMultiplier * fftMultiplier);
     endShape();
   }
 }
