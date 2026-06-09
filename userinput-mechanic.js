@@ -10,7 +10,7 @@ function keyPressed() {
 
 // Call each frame: decay boost toward 0.
 function updateWaveBoost() {
-  userInputWaveBoost *= 0.93;
+  userInputWaveBoost *= 0.93; 
 }
 
 // Used by perlin-mechanic.js: returns the current total amplitude.
@@ -60,6 +60,15 @@ function mousePressed() {
         delay: i * 0.08,
         flipX,
         forwardDist: random(40, 90) * direction,
+        playedSplash: false,
+        splashIndex: floor(random(splashSounds.length)),
+        fishScale: map(
+          random(340, 500),
+          340,
+          500,
+          0.7,
+          1.3
+        )
       });
     }
   }
@@ -74,14 +83,46 @@ function updateAndDrawFish(deltaSeconds) {
     if (f.t >= 1 + f.delay) return false; // Animation done, remove.
 
     const progress = constrain(f.t - f.delay, 0, 1);
-    if (progress <= 0) return true; // Still waiting for delay.
+    if (progress <= 0) return true;
+    // Fish leaves water -> play splash once
+    if (
+      !f.playedSplash &&
+      progress > 0.05 &&
+      audioPlaying
+    ) {
+      
+      f.playedSplash = true;
+      const splash = splashSounds[f.splashIndex];
+      if (splash && splash.isLoaded()) {
+        // deeper fish = louder splash
+        const volume = map(
+          f.waterY,
+          340,
+          500,
+          0.35,
+          1.0,
+          true
+        );
+        
+        splash.setVolume(volume);
+        splash.play();
+      }
+    }
 
-    const jumpHeight = 80;
+    const jumpHeight = map(
+      f.waterY,
+      340,
+      500,
+      55,
+      100,
+      true
+    );
+
     const offsetY = -sin(PI * progress) * jumpHeight;
     const offsetX = progress * f.forwardDist; // moves forward in the direction the fish faces
 
-    const fishW = 50;
-    const fishH = 30;
+    const fishW = 50 * f.fishScale;
+    const fishH = 30 * f.fishScale;
     const alpha = progress < 0.1 ? progress * 10 * 255 : progress > 0.9 ? (1 - progress) * 10 * 255 : 255;
 
     push();

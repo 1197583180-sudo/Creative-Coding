@@ -2,6 +2,8 @@
 // AUDIO MECHANIC
 // =====================================================
 
+let splashSounds = [];
+
 let sunSound;
 let waveSound;
 
@@ -27,9 +29,19 @@ const AUDIO_BTN_SIZE = 70;
 
 function preloadAudio() {
   soundFormats('mp3');
-  audioButtonImg = loadImage('images/blue_music_button.png');
-}
 
+  audioButtonImg = loadImage('images/blue_music_button.png');
+
+  for (let i = 1; i <= 4; i++) {
+    splashSounds.push(
+      loadSound(
+        `audio/splash${i}.mp3`,
+        () => console.log(`splash${i} loaded`),
+        err => console.error(`splash${i} failed`, err)
+      )
+    );
+  }
+}
 // -----------------------------------------------------
 
 function drawAudioButton() {
