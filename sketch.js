@@ -35,11 +35,14 @@ function draw() {
   // 云朵和小鸟画在背景渐变之后、山和太阳之前，让它们停留在天空层。
   // Clouds and birds are drawn after the background gradient and before the mountain/sun, keeping them in the sky layer.
   drawTimeBasedClouds();
-  drawTimeBasedBirds();
 
   // 山和太阳先画，后面的海浪会盖在它们前面，形成远近层次。
   // Draw the mountain and sun first, so later waves appear in front and create depth.
   drawMountainAndSun();
+
+  // 鸟群画在太阳之后，确保它们出现在太阳前方。
+  // Birds drawn after the sun so they appear in front of it.
+  drawTimeBasedBirds();
 
   // 计算作品相对于当前窗口的缩放和居中偏移。
   // Calculate the artwork scale and centering offset for the current window.

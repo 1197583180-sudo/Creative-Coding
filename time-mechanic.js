@@ -29,15 +29,10 @@ const timeBasedClouds = [
   { x: 920,  y: 150, scale: 0.58, speed: 8,  alpha: 132, delay: 2.6, wait: 0 },
 ];
 
-// 海鸥群的飞行和等待时长。9 秒慢速飞行并淡入淡出，3 秒等待后重来。
-// Flight and waiting durations for the seagull flock: 9 seconds of slow flight with fade-in/out, then 3 seconds waiting.
-const birdFlockFlightDuration = 9;
-const birdFlockWaitDuration = 3;
-
-// 海鸥群轨迹，使用 1000 x 500 设计坐标。位置在山体和太阳左侧天空区域。
-// Flock path in the 1000 x 500 design coordinate system, placed in the sky left of the mountain and sun.
-const birdFlockStart = { x: 470, y: 255 };
-const birdFlockEnd = { x: 210, y: 140 };
+// 海鸥群持续从右向左飞行，离开左侧后从右侧重新进入，无限循环。
+// The seagull flock scrolls continuously right to left, wrapping from the left edge back to the right.
+const birdFlockSpeed = 65; // design px/second
+const birdFlockY = 155;    // fixed sky height in design coordinates
 
 // 参考图风格的固定海鸥编队。每只海鸥只保存相对位置、大小和翅膀相位差，不使用 random()。
 // Fixed seagull formation in the reference style. Each bird stores only relative position, size, and wing phase offset; no random() is used.
@@ -51,9 +46,9 @@ const timeBasedBirdFlock = [
   { ox: 142, oy: 8,   scale: 0.48, phaseOffset: 4.8, wingSpeed: 5.7, variant: 0 },
 ];
 
-// 海鸥群计时状态。flying 期间移动和淡出；waiting 期间隐藏并倒计时。
-// Timer state for the flock. During flying it moves and fades; during waiting it is hidden and counts down.
-let birdFlockState = 'flying';
+// 海鸥群当前中心 x 位置（设计坐标）和翅膀相位计时器。
+// Current flock centre x in design coordinates, and a running timer for wing phase.
+let birdFlockX = 1150;
 let birdFlockTimer = 0;
 
 function setupTimeBasedClouds() {
@@ -69,9 +64,7 @@ function setupTimeBasedClouds() {
 }
 
 function setupTimeBasedBirds() {
-  // 初始化海鸥群循环：从 flying 状态的第 0 秒开始。
-  // Initialize the flock loop: start at second 0 of the flying state.
-  birdFlockState = 'flying';
+  birdFlockX = 1150;
   birdFlockTimer = 0;
 }
 
@@ -99,20 +92,11 @@ function updateTimeBasedClouds(deltaSeconds) {
 }
 
 function updateTimeBasedBirds(deltaSeconds) {
-  // 只用 deltaSeconds 推进状态计时器：飞行 5 秒，等待 3 秒。
-  // Advance the state timer only with deltaSeconds: 5 seconds flying, 3 seconds waiting.
   birdFlockTimer += deltaSeconds;
-
-  if (birdFlockState === 'flying' && birdFlockTimer >= birdFlockFlightDuration) {
-    // 飞行事件结束后切换到等待事件。
-    // After the flight event ends, switch to the waiting event.
-    birdFlockState = 'waiting';
-    birdFlockTimer = 0;
-  } else if (birdFlockState === 'waiting' && birdFlockTimer >= birdFlockWaitDuration) {
-    // 等待结束后重置回左下起点，开始下一轮飞行。
-    // After waiting, reset to the lower-left start and begin the next flight.
-    birdFlockState = 'flying';
-    birdFlockTimer = 0;
+  birdFlockX -= birdFlockSpeed * deltaSeconds;
+  // When the whole formation has cleared the left edge, wrap back to the right.
+  if (birdFlockX < -300) {
+    birdFlockX = 1150;
   }
 }
 
@@ -257,8 +241,13 @@ function drawSingleTimeBasedBird(bird, alpha, groupPhase) {
   const flap = sin(wingPhase);
   const wingLift = map(flap, -1, 1, -2.5, 3.5);
 
+  // Individual drift: each bird uses its phaseOffset as a unique Perlin seed so they
+  // wander independently while still following the flock. Kept small so formation holds.
+  const driftX = (noise(bird.phaseOffset * 4,       groupPhase * 0.28) - 0.5) * 14;
+  const driftY = (noise(bird.phaseOffset * 4 + 100, groupPhase * 0.65) - 0.5) * 40;
+
   push();
-  translate(bird.ox, bird.oy + sin(wingPhase * 0.35) * 2);
+  translate(bird.ox + driftX, bird.oy + driftY + sin(wingPhase * 0.35) * 2);
   scale(bird.scale);
 
   // 参考图风格：远景海鸥由多段有粗细变化的深色笔触构成，不画实体鸟身。
@@ -289,8 +278,6 @@ function drawSingleTimeBasedBird(bird, alpha, groupPhase) {
 }
 
 function drawTimeBasedBirds() {
-  // 小鸟与云朵使用同一套设计坐标系，因此窗口缩放时仍保持和天空构图一致。
-  // Birds share the same design coordinate system as clouds, so they stay aligned with the sky composition during resizing.
   const artworkScale = max(width / artworkWidth, height / artworkHeight);
   const artworkOffsetX = (width - artworkWidth * artworkScale) / 2;
   const artworkOffsetY = (height - artworkHeight * artworkScale) / 2;
@@ -299,28 +286,12 @@ function drawTimeBasedBirds() {
   translate(artworkOffsetX, artworkOffsetY);
   scale(artworkScale);
 
-  if (birdFlockState === 'flying') {
-    // 9 秒飞行进度：0 在右下起点，1 在左上终点。
-    // Nine-second flight progress: 0 at the lower-right start, 1 at the upper-left end.
-    const progress = constrain(birdFlockTimer / birdFlockFlightDuration, 0, 1);
-    const flockX = lerp(birdFlockStart.x, birdFlockEnd.x, progress);
-    const flockY = lerp(birdFlockStart.y, birdFlockEnd.y, progress);
-
-    // 起飞阶段淡入，最后阶段淡出，避免海鸥群突然出现或消失。
-    // Fade in at takeoff and fade out near the end to avoid sudden appearance or disappearance.
-    const fadeIn = constrain(map(progress, 0.0, 0.16, 0, 1), 0, 1);
-    const fadeOut = constrain(map(progress, 0.84, 1.0, 1, 0), 0, 1);
-    const flockAlpha = 205 * fadeIn * fadeOut;
-
-    push();
-    translate(flockX, flockY);
-
-    for (const bird of timeBasedBirdFlock) {
-      drawSingleTimeBasedBird(bird, flockAlpha, birdFlockTimer);
-    }
-
-    pop();
+  push();
+  translate(birdFlockX, birdFlockY);
+  for (const bird of timeBasedBirdFlock) {
+    drawSingleTimeBasedBird(bird, 205, birdFlockTimer);
   }
+  pop();
 
   pop();
 }
@@ -454,17 +425,15 @@ function drawBoat(x, y, boatWidth) {
     endShape(CLOSE);
   };
 
-  const drawPassengers = () => {
-    // 小人作为船的一部分画在 drawBoat() 内，因此会自动继承船的 translate 和 rotate。
-    // Passengers are drawn inside drawBoat(), so they automatically inherit the boat's translate and rotate.
-    const passengerCount = boatWidth >= 200 ? 4 : 2;
-    const spacing = boatWidth * 0.145;
-    const startX = x - spacing * (passengerCount - 1) / 2;
-    const deckY = tipY - boatHeight * 0.035;
-    const personScale = boatWidth * 0.0085;
+  const passengerCount = boatWidth >= 200 ? 4 : 2;
+  const passengerSpacing = boatWidth * 0.145;
+  const passengerStartX = x - passengerSpacing * (passengerCount - 1) / 2;
+  const deckY = tipY + boatHeight * 0.12;
+  const personScale = boatWidth * 0.0085;
 
+  const drawPassengers = () => {
     for (let i = 0; i < passengerCount; i++) {
-      const px = startX + spacing * i;
+      const px = passengerStartX + passengerSpacing * i;
       const lean = i % 2 === 0 ? -0.20 : 0.12;
       const robeColor = i % 2 === 0 ? color(38, 42, 54) : color(72, 49, 34);
 
@@ -473,22 +442,23 @@ function drawBoat(x, y, boatWidth) {
       scale(personScale);
       rotate(lean);
 
-      // 版画式斗笠：宽而扁的三角形和墨色边线，比圆头小人更像远景船夫。
-      // Woodblock-style straw hat: a wide flat triangle with ink edging reads more like a distant boatman than a cartoon head.
+      // 头部先画，帽子后画以覆盖在上方。
+      stroke(62, 41, 24, 185);
+      strokeWeight(0.03);
+      fill(42, 29, 22);
+      ellipse(0, -5.6, 5.0, 4.2);
+
+      // 版画式斗笠。
       stroke(62, 41, 24, 185);
       strokeWeight(0.75);
       fill(218, 190, 128);
-      triangle(-6.8, -8.2, 6.8, -8.2, 0, -13.4);
-      line(-5.2, -8.2, 5.2, -8.2);
+      beginShape();
+      vertex(-6.8, -6.0);
+      quadraticVertex(0, -4.5, 6.8, -6.0);
+      vertex(0, -11.2);
+      endShape(CLOSE);
 
-      // 头部只用帽檐下方的小暗点暗示，避免现代卡通脸。
-      // The head is only implied by a small dark mark under the brim, avoiding a modern cartoon face.
-      noStroke();
-      fill(42, 29, 22);
-      ellipse(0, -6.8, 3.3, 2.8);
-
-      // 弯腰身体使用克制色块和墨色外轮廓，贴合浮世绘远景人物的符号化语言。
-      // The bent body uses restrained color blocks and ink-like contours, matching the symbolic language of distant ukiyo-e figures.
+      // 身体。
       stroke(28, 24, 22, 180);
       strokeWeight(0.8);
       fill(robeColor);
@@ -500,17 +470,44 @@ function drawBoat(x, y, boatWidth) {
       quadraticVertex(-5.0, 0.0, -3.6, -5.0);
       endShape(CLOSE);
 
-      // 短手臂和船桨用细墨线表现，细节少但动作明确。
-      // Short arms and oars are drawn with thin ink lines: minimal detail but clear rowing action.
+      pop();
+    }
+  };
+
+  const drawPassengerArms = () => {
+    // 手臂和桨绕身体端点摆动，模拟划船动作。
+    // Arms and oars rotate around their body-end pivot to simulate rowing.
+    for (let i = 0; i < passengerCount; i++) {
+      const px = passengerStartX + passengerSpacing * i;
+      const lean = i % 2 === 0 ? -0.20 : 0.12;
+      const rowAngle = sin(noiseTime * 2.5 + i * 1.5) * 0.35;
+
+      push();
+      translate(px, deckY);
+      scale(personScale);
+      rotate(lean);
+
       stroke(38, 26, 18, 165);
+
+      // Arm pivots at body-end; oar is nested at the arm tip so it stays connected.
+      push();
+      translate(2.2, -1.8);
+      rotate(rowAngle);
       strokeWeight(0.75);
-      line(2.2, -1.8, 7.5, 2.8);
+      line(0, 0, 5.3, 4.6);
+      // Oar starts exactly at the arm tip.
       strokeWeight(0.95);
-      line(6.8, 1.2, 14.2, 8.0);
+      line(5.3, 4.6, 5.3 + 7.4, 4.6 + 6.8);
+      pop();
 
       pop();
     }
   };
+
+  // 人物先画，之后船身的颜色层会盖住下半身，只露出帽子和头部，符合浮世绘远景效果。
+  // Passengers are drawn first; the boat hull layers painted on top cover their lower bodies,
+  // leaving only hats and heads visible above the rim — matching the ukiyo-e distant-figure style.
+  drawPassengers();
 
   // 从深到浅依次覆盖，形成木船的体积感。
   // Paint from darker to lighter overlays to give the wooden boat volume.
@@ -526,14 +523,16 @@ function drawBoat(x, y, boatWidth) {
   fill(shadeOf(0));
   fillAboveBand(bandEdgesAt(1 / 4));
 
-  drawPassengers();
-
   // 最后加描边，明确船的轮廓。
   // Add the final outline to clarify the boat shape.
   stroke('#5E3F22');
   strokeWeight(0.5);
   noFill();
   drawHull();
+
+  // 手臂和桨画在最后，确保它们显示在船身上方。
+  // Arms and oars drawn last so they appear on top of the boat hull.
+  drawPassengerArms();
 }
 
 function drawTimeDrivenBoat(baseX, baseY, boatWidth, direction = 1, speed = 1, verticalRange = 18) {
