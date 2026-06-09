@@ -560,6 +560,11 @@ function drawTimeDrivenBoat(baseX, baseY, boatWidth, direction = 1, speed = 1, v
 function drawTimeDrivenSunRings(centerX, sunCenterY, sunRadius) {
   noStroke();
 
+  // sunGlowMultiplier (from audio_mechanic.js) makes rings expand further and pulse brighter with audio.
+  const audioBoost = typeof sunGlowMultiplier !== 'undefined' ? sunGlowMultiplier : 1.0;
+  const maxScale = map(audioBoost, 0.7, 3.0, 3.0, 5.5, true);
+  const alphaMult = map(audioBoost, 0.7, 3.0, 0.7, 2.0, true);
+
   // 三个光环错开时间扩散，形成连续的太阳脉冲效果。
   // Three rings expand with staggered timing, creating a continuous solar pulse effect.
   for (let ring = 0; ring < 3; ring++) {
@@ -567,13 +572,14 @@ function drawTimeDrivenSunRings(centerX, sunCenterY, sunRadius) {
     // progress loops from 0 to 1 and represents the current ring's life cycle.
     const progress = (noiseTime * 0.3 + ring / 3) % 1;
 
-    // 光环从太阳半径扩展到三倍半径。
-    // The ring expands from the sun radius to three times that radius.
-    const ringRadius = lerp(sunRadius, sunRadius * 3, progress);
+    // 光环从太阳半径扩展到 maxScale 倍，音频越强扩得越大。
+    // The ring expands from the sun radius to maxScale times that radius; louder audio = larger expansion.
+    const ringRadius = lerp(sunRadius, sunRadius * maxScale, progress);
 
     // progress 越大透明度越低，使光环扩散后逐渐消失。
     // The alpha decreases as progress grows, making each expanding ring fade away.
-    fill(232, 77, 28, pow(constrain(1 - progress * 3, 0, 1), 3) * 220);
+    const baseAlpha = pow(constrain(1 - progress * 3, 0, 1), 3) * 220;
+    fill(232, 77, 28, min(baseAlpha * alphaMult, 255));
     circle(centerX, sunCenterY, ringRadius * 2);
   }
 }
